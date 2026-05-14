@@ -39,33 +39,23 @@ export default function MatchCard({ match, canPredict, tr }: Props) {
         <span className="text-xs text-gray-500">{kickoff}</span>
       </div>
 
-      {/* Teams */}
+      {/* flag | name | score | name | flag — all on one line */}
       <div className="flex items-center gap-2">
-        <div className="flex-1 flex flex-col items-center gap-1">
-          <div className="h-10 flex items-center justify-center">
-            <span className="text-3xl leading-none">{match.flag_a || '🏳️'}</span>
-          </div>
-          <span className="text-white text-xs font-semibold text-center leading-tight">{match.team_a}</span>
-        </div>
-
-        <div className="shrink-0 w-16 h-10 flex items-center justify-center">
+        <span className="text-2xl leading-none shrink-0">{match.flag_a || '🏳️'}</span>
+        <span className="flex-1 text-white text-xs font-semibold text-right leading-tight">{match.team_a}</span>
+        <div className="shrink-0 w-14 flex justify-center">
           {isFinished && match.result_a != null && match.result_b != null ? (
             <div className="flex items-center gap-1">
-              <span className="text-2xl font-bold text-white">{match.result_a}</span>
-              <span className="text-gray-500">-</span>
-              <span className="text-2xl font-bold text-white">{match.result_b}</span>
+              <span className="text-xl font-bold text-white">{match.result_a}</span>
+              <span className="text-gray-500 text-sm">-</span>
+              <span className="text-xl font-bold text-white">{match.result_b}</span>
             </div>
           ) : (
             <span className="text-sm text-gray-600 italic">vs</span>
           )}
         </div>
-
-        <div className="flex-1 flex flex-col items-center gap-1">
-          <div className="h-10 flex items-center justify-center">
-            <span className="text-3xl leading-none">{match.flag_b || '🏳️'}</span>
-          </div>
-          <span className="text-white text-xs font-semibold text-center leading-tight">{match.team_b}</span>
-        </div>
+        <span className="flex-1 text-white text-xs font-semibold text-left leading-tight">{match.team_b}</span>
+        <span className="text-2xl leading-none shrink-0">{match.flag_b || '🏳️'}</span>
       </div>
 
       {/* Prediction / result row */}
