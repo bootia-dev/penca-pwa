@@ -32,9 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} className={`${geist.variable} h-full`}>
-      <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-      </head>
+      <head />
       <body className="min-h-full bg-gray-950 text-white antialiased">
         <Providers>
           <ServiceWorkerRegistrar />
