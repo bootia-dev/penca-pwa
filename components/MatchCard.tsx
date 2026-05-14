@@ -39,31 +39,33 @@ export default function MatchCard({ match, canPredict, tr }: Props) {
         <span className="text-xs text-gray-500">{kickoff}</span>
       </div>
 
-      {/* Teams: 3-column grid so flags, score, and names stay aligned */}
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-2">
-        {/* Flags row */}
-        <div className="flex justify-center">
-          <span className="text-3xl leading-none">{match.flag_a || '🏳️'}</span>
+      {/* Teams */}
+      <div className="flex items-center gap-2">
+        <div className="flex-1 flex flex-col items-center gap-1">
+          <div className="h-10 flex items-center justify-center">
+            <span className="text-3xl leading-none">{match.flag_a || '🏳️'}</span>
+          </div>
+          <span className="text-white text-xs font-semibold text-center leading-tight">{match.team_a}</span>
         </div>
-        <div className="flex justify-center min-w-[64px]">
+
+        <div className="shrink-0 w-16 h-10 flex items-center justify-center">
           {isFinished && match.result_a != null && match.result_b != null ? (
             <div className="flex items-center gap-1">
               <span className="text-2xl font-bold text-white">{match.result_a}</span>
-              <span className="text-gray-500 text-lg">-</span>
+              <span className="text-gray-500">-</span>
               <span className="text-2xl font-bold text-white">{match.result_b}</span>
             </div>
           ) : (
             <span className="text-sm text-gray-600 italic">vs</span>
           )}
         </div>
-        <div className="flex justify-center">
-          <span className="text-3xl leading-none">{match.flag_b || '🏳️'}</span>
-        </div>
 
-        {/* Names row — same columns, inherently aligned */}
-        <p className="text-white text-xs font-semibold text-center leading-tight mt-1">{match.team_a}</p>
-        <div />
-        <p className="text-white text-xs font-semibold text-center leading-tight mt-1">{match.team_b}</p>
+        <div className="flex-1 flex flex-col items-center gap-1">
+          <div className="h-10 flex items-center justify-center">
+            <span className="text-3xl leading-none">{match.flag_b || '🏳️'}</span>
+          </div>
+          <span className="text-white text-xs font-semibold text-center leading-tight">{match.team_b}</span>
+        </div>
       </div>
 
       {/* Prediction / result row */}
