@@ -10,9 +10,9 @@ const STAGE_LABELS: Record<string, string> = {
 }
 
 const POINTS_COLORS: Record<number, string> = {
-  3: 'text-yellow-400',
-  2: 'text-emerald-400',
-  1: 'text-blue-400',
+  5: 'text-yellow-400',
+  4: 'text-emerald-400',
+  3: 'text-blue-400',
   0: 'text-red-400',
 }
 

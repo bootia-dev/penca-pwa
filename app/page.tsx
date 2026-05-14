@@ -48,16 +48,16 @@ export default async function LandingPage() {
 
         <div className="mt-10 grid grid-cols-3 gap-4 text-center">
           <div>
-            <div className="text-2xl font-bold text-yellow-400">3pts</div>
-            <div className="text-xs text-gray-500 mt-1">Exact score</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-emerald-400">2pts</div>
-            <div className="text-xs text-gray-500 mt-1">Right difference</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-blue-400">1pt</div>
+            <div className="text-2xl font-bold text-blue-400">3pts</div>
             <div className="text-xs text-gray-500 mt-1">Right winner</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-emerald-400">+1pt</div>
+            <div className="text-xs text-gray-500 mt-1">Goal difference</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-yellow-400">+1pt</div>
+            <div className="text-xs text-gray-500 mt-1">Exact score</div>
           </div>
         </div>
       </div>
