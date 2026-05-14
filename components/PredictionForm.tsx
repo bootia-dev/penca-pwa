@@ -32,14 +32,16 @@ export default function PredictionForm({ matchId, initialA, initialB, labels }: 
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <ScoreInput value={a} onChange={setA} />
-      <span className="text-gray-500 text-sm font-medium">-</span>
-      <ScoreInput value={b} onChange={setB} />
+    <div className="flex flex-col items-center gap-2 w-full">
+      <div className="flex items-center gap-3">
+        <ScoreInput value={a} onChange={setA} />
+        <span className="text-gray-500 text-sm font-medium">-</span>
+        <ScoreInput value={b} onChange={setB} />
+      </div>
       <button
         onClick={submit}
         disabled={isPending}
-        className="ml-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-sm font-medium transition-colors"
+        className="px-6 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-sm font-medium transition-colors w-full max-w-[160px]"
       >
         {isPending ? '...' : saved ? labels.saved : labels.save}
       </button>

@@ -41,62 +41,57 @@ export default function MatchCard({ match, canPredict, tr }: Props) {
 
       {/* Teams row */}
       <div className="flex items-center gap-2">
-        {/* Team A */}
-        <div className="flex flex-col items-center gap-0.5 w-16 shrink-0">
+        <div className="flex flex-col items-center gap-0.5 flex-1">
           <span className="text-2xl leading-none">{match.flag_a || '🏳️'}</span>
-          <span className="text-white text-xs font-semibold text-center leading-tight line-clamp-2">
-            {match.team_a}
-          </span>
+          <span className="text-white text-xs font-semibold text-center leading-tight">{match.team_a}</span>
         </div>
 
-        {/* Center */}
-        <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
+        <div className="shrink-0 px-2">
           {isFinished && match.result_a != null && match.result_b != null ? (
-            <>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-white">{match.result_a}</span>
-                <span className="text-gray-500">-</span>
-                <span className="text-2xl font-bold text-white">{match.result_b}</span>
-              </div>
-              {prediction && prediction.points != null ? (
-                <div className="flex items-center gap-1 flex-wrap justify-center">
-                  <span className="text-xs text-gray-500">{tr.matchCard.yourPick}</span>
-                  <span className="text-xs text-gray-400">
-                    {prediction.predicted_a}-{prediction.predicted_b}
-                  </span>
-                  <span className={`text-xs font-bold ${POINTS_COLORS[prediction.points] ?? 'text-gray-400'}`}>
-                    +{prediction.points}pts
-                  </span>
-                </div>
-              ) : (
-                <span className="text-xs text-gray-600">{tr.matchCard.noPrediction}</span>
-              )}
-            </>
-          ) : canPredict ? (
-            <PredictionForm
-              matchId={match.id}
-              initialA={prediction?.predicted_a}
-              initialB={prediction?.predicted_b}
-              labels={tr.predictionForm}
-            />
-          ) : prediction ? (
-            <div className="flex items-center gap-2">
-              <span className="text-xl font-bold text-gray-300">{prediction.predicted_a}</span>
+            <div className="flex items-center gap-1">
+              <span className="text-2xl font-bold text-white">{match.result_a}</span>
               <span className="text-gray-500">-</span>
-              <span className="text-xl font-bold text-gray-300">{prediction.predicted_b}</span>
+              <span className="text-2xl font-bold text-white">{match.result_b}</span>
             </div>
           ) : (
             <span className="text-sm text-gray-600 italic">vs</span>
           )}
         </div>
 
-        {/* Team B */}
-        <div className="flex flex-col items-center gap-0.5 w-16 shrink-0">
+        <div className="flex flex-col items-center gap-0.5 flex-1">
           <span className="text-2xl leading-none">{match.flag_b || '🏳️'}</span>
-          <span className="text-white text-xs font-semibold text-center leading-tight line-clamp-2">
-            {match.team_b}
-          </span>
+          <span className="text-white text-xs font-semibold text-center leading-tight">{match.team_b}</span>
         </div>
+      </div>
+
+      {/* Prediction / result row */}
+      <div className="mt-3 flex justify-center">
+        {isFinished && match.result_a != null && match.result_b != null ? (
+          prediction && prediction.points != null ? (
+            <div className="flex items-center gap-1 flex-wrap justify-center">
+              <span className="text-xs text-gray-500">{tr.matchCard.yourPick}</span>
+              <span className="text-xs text-gray-400">{prediction.predicted_a}-{prediction.predicted_b}</span>
+              <span className={`text-xs font-bold ${POINTS_COLORS[prediction.points] ?? 'text-gray-400'}`}>
+                +{prediction.points}pts
+              </span>
+            </div>
+          ) : (
+            <span className="text-xs text-gray-600">{tr.matchCard.noPrediction}</span>
+          )
+        ) : canPredict ? (
+          <PredictionForm
+            matchId={match.id}
+            initialA={prediction?.predicted_a}
+            initialB={prediction?.predicted_b}
+            labels={tr.predictionForm}
+          />
+        ) : prediction ? (
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold text-gray-300">{prediction.predicted_a}</span>
+            <span className="text-gray-500">-</span>
+            <span className="text-xl font-bold text-gray-300">{prediction.predicted_b}</span>
+          </div>
+        ) : null}
       </div>
     </div>
   )
