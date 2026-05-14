@@ -1,18 +1,20 @@
 import { auth, signIn } from '@/auth'
 import { redirect } from 'next/navigation'
+import { getLocale, t } from '@/lib/i18n'
 
 export default async function LandingPage() {
   const session = await auth()
   if (session) redirect('/dashboard')
+
+  const locale = await getLocale()
+  const tr = t(locale).landing
 
   return (
     <main className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-6">
       <div className="max-w-sm w-full text-center">
         <div className="text-6xl mb-4">⚽</div>
         <h1 className="text-4xl font-bold text-white mb-2">Penca</h1>
-        <p className="text-gray-400 mb-8">
-          Predict World Cup results and compete with friends for the top spot.
-        </p>
+        <p className="text-gray-400 mb-8">{tr.description}</p>
 
         <div className="flex flex-col gap-3">
           <form
@@ -26,7 +28,7 @@ export default async function LandingPage() {
               className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 font-semibold py-3 px-6 rounded-xl hover:bg-gray-100 transition-colors"
             >
               <GoogleIcon />
-              Continue with Google
+              {tr.withGoogle}
             </button>
           </form>
 
@@ -41,7 +43,7 @@ export default async function LandingPage() {
               className="w-full flex items-center justify-center gap-3 bg-gray-800 text-white font-semibold py-3 px-6 rounded-xl border border-gray-700 hover:bg-gray-700 transition-colors"
             >
               <GitHubIcon />
-              Continue with GitHub
+              {tr.withGithub}
             </button>
           </form>
         </div>
@@ -49,15 +51,15 @@ export default async function LandingPage() {
         <div className="mt-10 grid grid-cols-3 gap-4 text-center">
           <div>
             <div className="text-2xl font-bold text-blue-400">3pts</div>
-            <div className="text-xs text-gray-500 mt-1">Right winner</div>
+            <div className="text-xs text-gray-500 mt-1">{tr.rightWinner}</div>
           </div>
           <div>
             <div className="text-2xl font-bold text-emerald-400">+1pt</div>
-            <div className="text-xs text-gray-500 mt-1">Goal difference</div>
+            <div className="text-xs text-gray-500 mt-1">{tr.goalDiff}</div>
           </div>
           <div>
             <div className="text-2xl font-bold text-yellow-400">+1pt</div>
-            <div className="text-xs text-gray-500 mt-1">Exact score</div>
+            <div className="text-xs text-gray-500 mt-1">{tr.exactScore}</div>
           </div>
         </div>
       </div>

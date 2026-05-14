@@ -7,9 +7,10 @@ interface Props {
   matchId: string
   initialA?: number
   initialB?: number
+  labels: { save: string; saved: string }
 }
 
-export default function PredictionForm({ matchId, initialA, initialB }: Props) {
+export default function PredictionForm({ matchId, initialA, initialB, labels }: Props) {
   const [a, setA] = useState(initialA ?? 0)
   const [b, setB] = useState(initialB ?? 0)
   const [isPending, startTransition] = useTransition()
@@ -40,7 +41,7 @@ export default function PredictionForm({ matchId, initialA, initialB }: Props) {
         disabled={isPending}
         className="ml-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-sm font-medium transition-colors"
       >
-        {isPending ? '...' : saved ? 'Saved!' : 'Save'}
+        {isPending ? '...' : saved ? labels.saved : labels.save}
       </button>
       {error && <span className="text-red-400 text-xs">{error}</span>}
     </div>

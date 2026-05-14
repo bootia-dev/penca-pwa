@@ -1,19 +1,18 @@
 import { auth, signOut } from '@/auth'
 import { db } from '@/lib/supabase'
+import { getLocale, t } from '@/lib/i18n'
 import Navbar from '@/components/Navbar'
 import Image from 'next/image'
 
 export const revalidate = 0
 
 export default async function ProfilePage() {
-  const session = (await auth())!
-  const user = session.user!
+  const [session, locale] = await Promise.all([auth(), getLocale()])
+  const user = session!.user!
   const userId = user.email!
+  const tr = t(locale).profile
 
-  const { data: predictions } = await db()
-    .from('predictions')
-    .select('points')
-    .eq('user_id', userId)
+  const { data: predictions } = await db().from('predictions').select('points').eq('user_id', userId)
 
   const totalPoints = (predictions ?? []).reduce((sum, p) => sum + (p.points ?? 0), 0)
   const totalPredictions = predictions?.length ?? 0
@@ -23,7 +22,6 @@ export default async function ProfilePage() {
     <>
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 py-8 pb-24">
-        {/* Avatar + name */}
         <div className="flex flex-col items-center text-center mb-8">
           {user.image ? (
             <Image
@@ -42,14 +40,12 @@ export default async function ProfilePage() {
           <p className="text-gray-500 text-sm mt-1">{user.email}</p>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-8">
-          <StatCard label="Points" value={totalPoints} color="text-yellow-400" />
-          <StatCard label="Predictions" value={totalPredictions} color="text-blue-400" />
-          <StatCard label="Exact scores" value={exactScores} color="text-emerald-400" />
+          <StatCard label={tr.points} value={totalPoints} color="text-yellow-400" />
+          <StatCard label={tr.predictions} value={totalPredictions} color="text-blue-400" />
+          <StatCard label={tr.exactScores} value={exactScores} color="text-emerald-400" />
         </div>
 
-        {/* Sign out */}
         <form
           action={async () => {
             'use server'
@@ -60,7 +56,7 @@ export default async function ProfilePage() {
             type="submit"
             className="w-full py-3 rounded-xl border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors text-sm font-medium"
           >
-            Sign out
+            {tr.signOut}
           </button>
         </form>
       </main>

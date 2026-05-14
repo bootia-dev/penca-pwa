@@ -1,5 +1,6 @@
 import { auth } from '@/auth'
 import { db } from '@/lib/supabase'
+import { getLocale, t } from '@/lib/i18n'
 import Navbar from '@/components/Navbar'
 import MatchCard from '@/components/MatchCard'
 import type { Match, Prediction, MatchWithPrediction } from '@/types'
@@ -7,8 +8,9 @@ import type { Match, Prediction, MatchWithPrediction } from '@/types'
 export const revalidate = 60
 
 export default async function DashboardPage() {
-  const session = await auth()
+  const [session, locale] = await Promise.all([auth(), getLocale()])
   const userId = session!.user!.email!
+  const tr = t(locale)
 
   const [matchesRes, predictionsRes] = await Promise.all([
     db().from('matches').select('*').order('scheduled_at', { ascending: true }),
@@ -17,7 +19,6 @@ export default async function DashboardPage() {
 
   const matches: Match[] = matchesRes.data ?? []
   const predictions: Prediction[] = predictionsRes.data ?? []
-
   const predictionMap = new Map(predictions.map((p) => [p.match_id, p]))
   const now = new Date()
 
@@ -41,11 +42,11 @@ export default async function DashboardPage() {
       <main className="max-w-3xl mx-auto px-4 py-6 pb-24">
         <div className="mb-6 bg-gray-800 rounded-2xl p-4 border border-gray-700 flex items-center justify-between">
           <div>
-            <p className="text-gray-400 text-sm">Your total points</p>
+            <p className="text-gray-400 text-sm">{tr.dashboard.totalPoints}</p>
             <p className="text-3xl font-bold text-white">{totalPoints}</p>
           </div>
           <div className="text-right">
-            <p className="text-gray-400 text-sm">Predictions</p>
+            <p className="text-gray-400 text-sm">{tr.dashboard.predictions}</p>
             <p className="text-3xl font-bold text-white">{predictions.length}</p>
           </div>
         </div>
@@ -53,7 +54,7 @@ export default async function DashboardPage() {
         {upcoming.length > 0 && (
           <section className="mb-8">
             <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-3">
-              Upcoming
+              {tr.dashboard.upcoming}
             </h2>
             <div className="flex flex-col gap-3">
               {upcoming.map((match) => (
@@ -61,6 +62,7 @@ export default async function DashboardPage() {
                   key={match.id}
                   match={match}
                   canPredict={new Date(match.scheduled_at) > now}
+                  tr={tr}
                 />
               ))}
             </div>
@@ -70,11 +72,11 @@ export default async function DashboardPage() {
         {past.length > 0 && (
           <section>
             <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-3">
-              Results
+              {tr.dashboard.results}
             </h2>
             <div className="flex flex-col gap-3">
               {past.map((match) => (
-                <MatchCard key={match.id} match={match} canPredict={false} />
+                <MatchCard key={match.id} match={match} canPredict={false} tr={tr} />
               ))}
             </div>
           </section>
@@ -83,7 +85,7 @@ export default async function DashboardPage() {
         {matches.length === 0 && (
           <div className="text-center text-gray-600 mt-20">
             <div className="text-4xl mb-3">📅</div>
-            <p>No matches scheduled yet. Check back soon!</p>
+            <p>{tr.dashboard.noMatches}</p>
           </div>
         )}
       </main>

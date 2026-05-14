@@ -1,9 +1,12 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { auth } from '@/auth'
+import { getLocale, t } from '@/lib/i18n'
+import LanguagePicker from './LanguagePicker'
 
 export default async function Navbar() {
-  const session = await auth()
+  const [session, locale] = await Promise.all([auth(), getLocale()])
+  const tr = t(locale)
   const isAdmin = process.env.ADMIN_EMAILS?.split(',').includes(session?.user?.email ?? '')
 
   return (
@@ -13,10 +16,12 @@ export default async function Navbar() {
           Penca
         </Link>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <LanguagePicker current={locale} />
+
           {isAdmin && (
             <Link href="/admin" className="text-gray-400 hover:text-white text-sm transition-colors">
-              Admin
+              {tr.nav.admin}
             </Link>
           )}
 

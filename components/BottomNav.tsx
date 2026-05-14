@@ -2,43 +2,48 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import type { T } from '@/lib/i18n'
 
-const tabs = [
-  {
-    href: '/dashboard',
-    label: 'Matches',
-    icon: (active: boolean) => (
-      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-        <path d="M2 12h20" />
-      </svg>
-    ),
-  },
-  {
-    href: '/leaderboard',
-    label: 'Rankings',
-    icon: (active: boolean) => (
-      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
-        <path d="M18 20V10M12 20V4M6 20v-6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-  },
-  {
-    href: '/profile',
-    label: 'Profile',
-    icon: (active: boolean) => (
-      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-]
+interface Props {
+  labels: T['bottomNav']
+}
 
-export default function BottomNav() {
+export default function BottomNav({ labels }: Props) {
   const pathname = usePathname()
   if (pathname === '/') return null
+
+  const tabs = [
+    {
+      href: '/dashboard',
+      label: labels.matches,
+      icon: (active: boolean) => (
+        <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          <path d="M2 12h20" />
+        </svg>
+      ),
+    },
+    {
+      href: '/leaderboard',
+      label: labels.rankings,
+      icon: (active: boolean) => (
+        <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+          <path d="M18 20V10M12 20V4M6 20v-6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+    },
+    {
+      href: '/profile',
+      label: labels.profile,
+      icon: (active: boolean) => (
+        <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeLinecap="round" />
+        </svg>
+      ),
+    },
+  ]
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-50">

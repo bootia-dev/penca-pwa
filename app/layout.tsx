@@ -4,6 +4,7 @@ import './globals.css'
 import Providers from '@/components/Providers'
 import ServiceWorkerRegistrar from '@/components/ServiceWorkerRegistrar'
 import BottomNav from '@/components/BottomNav'
+import { getLocale, t } from '@/lib/i18n'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
@@ -25,9 +26,12 @@ export const viewport: Viewport = {
   maximumScale: 1,
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale()
+  const tr = t(locale)
+
   return (
-    <html lang="en" className={`${geist.variable} h-full`}>
+    <html lang={locale} className={`${geist.variable} h-full`}>
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
@@ -35,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <ServiceWorkerRegistrar />
           {children}
-          <BottomNav />
+          <BottomNav labels={tr.bottomNav} />
         </Providers>
       </body>
     </html>
