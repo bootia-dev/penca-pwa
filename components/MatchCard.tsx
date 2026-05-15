@@ -39,10 +39,12 @@ export default function MatchCard({ match, canPredict, tr }: Props) {
         <span className="text-xs text-gray-500">{kickoff}</span>
       </div>
 
-      {/* flag | name | score | name | flag — all on one line */}
+      {/* Teams + score row */}
       <div className="flex items-center gap-2">
-        <span className="text-2xl leading-none shrink-0">{match.flag_a || '🏳️'}</span>
-        <span className="flex-1 text-white text-xs font-semibold text-right leading-tight">{match.team_a}</span>
+        <div className="flex-1 flex items-center justify-end gap-1.5 min-w-0">
+          <span className="text-white text-xs font-semibold text-right leading-tight truncate">{match.team_a}</span>
+          <span className="text-2xl leading-none shrink-0">{match.flag_a || '🏳️'}</span>
+        </div>
         <div className="shrink-0 w-14 flex justify-center">
           {isFinished && match.result_a != null && match.result_b != null ? (
             <div className="flex items-center gap-1">
@@ -54,8 +56,10 @@ export default function MatchCard({ match, canPredict, tr }: Props) {
             <span className="text-sm text-gray-600 italic">vs</span>
           )}
         </div>
-        <span className="flex-1 text-white text-xs font-semibold text-left leading-tight">{match.team_b}</span>
-        <span className="text-2xl leading-none shrink-0">{match.flag_b || '🏳️'}</span>
+        <div className="flex-1 flex items-center gap-1.5 min-w-0">
+          <span className="text-2xl leading-none shrink-0">{match.flag_b || '🏳️'}</span>
+          <span className="text-white text-xs font-semibold text-left leading-tight truncate">{match.team_b}</span>
+        </div>
       </div>
 
       {/* Prediction / result row */}
