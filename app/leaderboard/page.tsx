@@ -3,6 +3,7 @@ import { db } from '@/lib/supabase'
 import { getLocale, t } from '@/lib/i18n'
 import Navbar from '@/components/Navbar'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export const revalidate = 60
 
@@ -59,10 +60,11 @@ export default async function LeaderboardPage() {
               const isMe = entry.user_id === currentUserId
               const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null
               return (
-                <div
+                <Link
                   key={entry.user_id}
+                  href={`/leaderboard/${encodeURIComponent(entry.user_id)}`}
                   className={`flex items-center gap-4 p-4 rounded-2xl border transition-colors ${
-                    isMe ? 'bg-emerald-900/30 border-emerald-700' : 'bg-gray-800 border-gray-700'
+                    isMe ? 'bg-emerald-900/30 border-emerald-700' : 'bg-gray-800 border-gray-700 hover:border-gray-500'
                   }`}
                 >
                   <div className="w-8 text-center">
@@ -90,7 +92,7 @@ export default async function LeaderboardPage() {
                     <p className="text-white font-bold text-lg">{entry.total_points}</p>
                     <p className="text-gray-500 text-xs">{tr.pts}</p>
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>

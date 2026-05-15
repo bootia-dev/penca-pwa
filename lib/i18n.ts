@@ -26,6 +26,8 @@ export const translations = {
       exact: 'exact',
       pts: 'pts',
       you: 'you',
+      back: 'Back',
+      noFinishedPicks: 'No finished matches yet.',
     },
     profile: {
       signOut: 'Sign out',
@@ -86,6 +88,8 @@ export const translations = {
       exact: 'exactos',
       pts: 'pts',
       you: 'vos',
+      back: 'Volver',
+      noFinishedPicks: 'No hay partidos finalizados aún.',
     },
     profile: {
       signOut: 'Cerrar sesión',
