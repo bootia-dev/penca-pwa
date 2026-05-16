@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'com.bootia.penca',
-  appName: 'Penca',
+  appName: 'Penca WC',
   // webDir is required by Capacitor CLI but not used when server.url is set
   webDir: 'public',
   server: {
