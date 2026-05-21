@@ -91,7 +91,7 @@ export default function GroupSelector({
 
       {/* Backdrop + bottom sheet */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/60 flex items-end justify-center z-50" onClick={close}>
+        <div className="fixed inset-0 bg-black/60 flex items-end justify-center z-[100]" onClick={close}>
           <div
             className="bg-gray-900 border border-gray-700 rounded-t-2xl w-full max-w-lg pb-10"
             onClick={(e) => e.stopPropagation()}
