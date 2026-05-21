@@ -53,6 +53,10 @@ export const translations = {
       noMatches: 'No matches yet.',
       setResult: 'Set result',
       deleteMatch: 'Delete match',
+      allGroups: 'All Groups',
+      noGroups: 'No groups yet.',
+      removeMember: 'Remove',
+      deleteGroup: 'Delete group',
     },
     matchCard: {
       yourPick: 'Your pick:',
@@ -142,6 +146,10 @@ export const translations = {
       noMatches: 'No hay partidos aún.',
       setResult: 'Cargar resultado',
       deleteMatch: 'Eliminar partido',
+      allGroups: 'Todos los grupos',
+      noGroups: 'No hay grupos aún.',
+      removeMember: 'Quitar',
+      deleteGroup: 'Eliminar grupo',
     },
     matchCard: {
       yourPick: 'Tu pronóstico:',

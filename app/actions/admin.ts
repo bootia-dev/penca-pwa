@@ -73,3 +73,16 @@ export async function deleteMatch(matchId: string) {
   revalidatePath('/dashboard')
   revalidatePath('/admin')
 }
+
+export async function removeGroupMember(groupId: string, userId: string) {
+  await requireAdmin()
+  await db().from('group_members').delete().eq('group_id', groupId).eq('user_id', userId)
+  revalidatePath('/admin')
+}
+
+export async function deleteGroup(groupId: string) {
+  await requireAdmin()
+  await db().from('groups').delete().eq('id', groupId)
+  revalidatePath('/admin')
+  revalidatePath('/leaderboard')
+}

@@ -2,7 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/supabase'
 import { getLocale, t } from '@/lib/i18n'
-import { createMatch, setMatchResult, deleteMatch } from '@/app/actions/admin'
+import { createMatch, setMatchResult, deleteMatch, removeGroupMember, deleteGroup } from '@/app/actions/admin'
 import Navbar from '@/components/Navbar'
 import type { Match } from '@/types'
 
@@ -16,10 +16,17 @@ export default async function AdminPage() {
   const tr = t(locale).admin
   const stages = t(locale).stages
 
-  const { data: matches } = await db()
-    .from('matches')
-    .select('*')
-    .order('scheduled_at', { ascending: true })
+  const [matchesRes, groupsRes, membersRes, usersRes] = await Promise.all([
+    db().from('matches').select('*').order('scheduled_at', { ascending: true }),
+    db().from('groups').select('id, name, invite_code, created_at').order('created_at', { ascending: true }),
+    db().from('group_members').select('group_id, user_id'),
+    db().from('users').select('id, name'),
+  ])
+
+  const matches = matchesRes.data
+  const groups = groupsRes.data ?? []
+  const memberRows: { group_id: string; user_id: string }[] = membersRes.data ?? []
+  const userMap = new Map((usersRes.data ?? []).map((u: any) => [u.id, u.name as string]))
 
   return (
     <>
@@ -75,7 +82,7 @@ export default async function AdminPage() {
           </form>
         </section>
 
-        <section>
+        <section className="mb-8">
           <h2 className="text-white font-semibold mb-4">{tr.allMatches}</h2>
           {!matches || matches.length === 0 ? (
             <p className="text-gray-500">{tr.noMatches}</p>
@@ -84,6 +91,46 @@ export default async function AdminPage() {
               {(matches as Match[]).map((match) => (
                 <MatchAdminCard key={match.id} match={match} tr={tr} />
               ))}
+            </div>
+          )}
+        </section>
+
+        <section>
+          <h2 className="text-white font-semibold mb-4">{tr.allGroups}</h2>
+          {groups.length === 0 ? (
+            <p className="text-gray-500">{tr.noGroups}</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {groups.map((group: any) => {
+                const members = memberRows.filter((m) => m.group_id === group.id)
+                return (
+                  <div key={group.id} className="bg-gray-800 rounded-2xl p-4 border border-gray-700">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <p className="text-white font-semibold">{group.name}</p>
+                        <p className="text-gray-500 text-xs font-mono">{group.invite_code} · {members.length} members</p>
+                      </div>
+                      <form action={async () => { 'use server'; await deleteGroup(group.id) }}>
+                        <button type="submit" className="text-xs text-red-500 hover:text-red-400 transition-colors">
+                          {tr.deleteGroup}
+                        </button>
+                      </form>
+                    </div>
+                    <div className="flex flex-col gap-1 mt-3">
+                      {members.map((m) => (
+                        <div key={m.user_id} className="flex items-center justify-between py-1">
+                          <span className="text-gray-300 text-sm truncate">{userMap.get(m.user_id) ?? m.user_id}</span>
+                          <form action={async () => { 'use server'; await removeGroupMember(group.id, m.user_id) }}>
+                            <button type="submit" className="text-xs text-gray-500 hover:text-red-400 transition-colors ml-4 shrink-0">
+                              {tr.removeMember}
+                            </button>
+                          </form>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           )}
         </section>
