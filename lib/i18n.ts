@@ -18,6 +18,10 @@ export const translations = {
       upcoming: 'Upcoming',
       results: 'Results',
       noMatches: 'No matches scheduled yet. Check back soon!',
+      tabPending: 'Pending',
+      tabPredicted: 'Predicted',
+      noPending: "You're all caught up — no matches left to predict.",
+      noPredicted: 'No predictions yet.',
     },
     leaderboard: {
       title: 'Leaderboard',
@@ -103,6 +107,10 @@ export const translations = {
       upcoming: 'Próximos partidos',
       results: 'Resultados',
       noMatches: '¡No hay partidos programados aún. Volvé pronto!',
+      tabPending: 'Pendientes',
+      tabPredicted: 'Pronosticados',
+      noPending: '¡Al día! No quedan partidos por pronosticar.',
+      noPredicted: 'Aún no hay pronósticos.',
     },
     leaderboard: {
       title: 'Tabla de posiciones',

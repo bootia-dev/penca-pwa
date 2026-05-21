@@ -1,3 +1,5 @@
+'use client'
+
 import PredictionForm from './PredictionForm'
 import type { MatchWithPrediction } from '@/types'
 import type { T } from '@/lib/i18n'
