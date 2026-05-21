@@ -1,16 +1,15 @@
 import { auth } from '@/auth'
 import { db } from '@/lib/supabase'
-import { cookies } from 'next/headers'
 import { getLocale, t } from '@/lib/i18n'
 import Navbar from '@/components/Navbar'
 import GroupSelector from '@/components/GroupSelector'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export const revalidate = 60
+export const revalidate = 0
 
-export default async function LeaderboardPage() {
-  const [session, locale, cookieStore] = await Promise.all([auth(), getLocale(), cookies()])
+export default async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ group?: string }> }) {
+  const [session, locale, sp] = await Promise.all([auth(), getLocale(), searchParams])
   const currentUserId = session!.user!.email!
   const tr = t(locale)
 
@@ -26,9 +25,8 @@ export default async function LeaderboardPage() {
     ? (await db().from('groups').select('id, name, invite_code, image_url').in('id', groupIds)).data ?? []
     : []
 
-  // Active group from cookie (validate membership)
-  const cookieGroupId = cookieStore.get('active_group')?.value ?? null
-  const activeGroup = groups.find((g) => g.id === cookieGroupId) ?? null
+  // Active group from URL param (validate membership)
+  const activeGroup = groups.find((g) => g.id === sp.group) ?? null
 
   // Determine the set of user IDs to show (null = everyone)
   let filterUserIds: string[] | null = null

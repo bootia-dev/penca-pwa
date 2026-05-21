@@ -1,10 +1,9 @@
 import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
-import GitHub from 'next-auth/providers/github'
 import { db } from '@/lib/supabase'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  providers: [Google, GitHub],
+  providers: [Google],
   callbacks: {
     async signIn({ user }) {
       if (!user.email) return false

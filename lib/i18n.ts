@@ -7,7 +7,6 @@ export const translations = {
     landing: {
       description: 'Predict World Cup results and compete with friends for the top spot.',
       withGoogle: 'Continue with Google',
-      withGithub: 'Continue with GitHub',
       rightWinner: 'Right winner',
       goalDiff: 'Goal difference',
       exactScore: 'Exact score',
@@ -22,6 +21,7 @@ export const translations = {
       tabPredicted: 'Predicted',
       noPending: "You're all caught up — no matches left to predict.",
       noPredicted: 'No predictions yet.',
+      noMatchesInGroup: 'No matches in this group.',
     },
     leaderboard: {
       title: 'Leaderboard',
@@ -100,7 +100,6 @@ export const translations = {
     landing: {
       description: 'Predecí los resultados del Mundial y competí con tus amigos.',
       withGoogle: 'Continuar con Google',
-      withGithub: 'Continuar con GitHub',
       rightWinner: 'Ganador correcto',
       goalDiff: 'Diferencia de goles',
       exactScore: 'Resultado exacto',
@@ -115,6 +114,7 @@ export const translations = {
       tabPredicted: 'Pronosticados',
       noPending: '¡Al día! No quedan partidos por pronosticar.',
       noPredicted: 'Aún no hay pronósticos.',
+      noMatchesInGroup: 'No hay partidos en este grupo.',
     },
     leaderboard: {
       title: 'Tabla de posiciones',

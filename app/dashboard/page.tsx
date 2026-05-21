@@ -58,7 +58,7 @@ export default async function DashboardPage() {
             <p>{tr.dashboard.noMatches}</p>
           </div>
         ) : (
-          <DashboardTabs predicted={predicted} pending={pending} tr={tr} />
+          <DashboardTabs predicted={predicted} pending={pending} tr={tr} allMatches={withPredictions} />
         )}
       </main>
     </>

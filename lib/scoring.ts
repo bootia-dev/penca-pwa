@@ -16,8 +16,8 @@ export function calculatePoints(
   let points = 3
   const isDraw = actualWinner === 0
 
-  // +1 for correct goal difference (non-draws only)
-  if (!isDraw && predictedDiff === actualDiff) points += 1
+  // +2 for correct goal difference (non-draws only)
+  if (!isDraw && predictedDiff === actualDiff) points += 2
 
   // +1 for exact score
   if (predictedA === resultA && predictedB === resultB) points += 1

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { setActiveGroup, createGroup, joinGroup } from '@/app/actions/groups'
+import { createGroup, joinGroup } from '@/app/actions/groups'
 import type { T } from '@/lib/i18n'
 
 type Group = { id: string; name: string; invite_code: string; image_url?: string | null }
@@ -39,11 +39,8 @@ export default function GroupSelector({
   }
 
   function switchGroup(groupId: string | null) {
-    startTransition(async () => {
-      await setActiveGroup(groupId)
-      router.refresh()
-      setIsOpen(false)
-    })
+    setIsOpen(false)
+    router.push(groupId ? `/leaderboard?group=${groupId}` : '/leaderboard')
   }
 
   function handleCreate() {
@@ -53,8 +50,7 @@ export default function GroupSelector({
       try {
         const result = await createGroup(name, password)
         setCreatedCode(result.inviteCode)
-        await setActiveGroup(result.groupId)
-        router.refresh()
+        router.push(`/leaderboard?group=${result.groupId}`)
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Error')
       }
@@ -69,9 +65,8 @@ export default function GroupSelector({
       if ('error' in result) {
         setError(g[result.error as keyof T['groups']] as string)
       } else {
-        await setActiveGroup(result.groupId)
-        router.refresh()
         close()
+        router.push(`/leaderboard?group=${result.groupId}`)
       }
     })
   }
