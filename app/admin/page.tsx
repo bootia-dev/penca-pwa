@@ -2,7 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/supabase'
 import { getLocale, t } from '@/lib/i18n'
-import { createMatch, setMatchResult, deleteMatch, removeGroupMember, deleteGroup } from '@/app/actions/admin'
+import { createMatch, setMatchResult, deleteMatch, removeGroupMember, deleteGroup, setGroupImage } from '@/app/actions/admin'
 import Navbar from '@/components/Navbar'
 import type { Match } from '@/types'
 
@@ -18,7 +18,7 @@ export default async function AdminPage() {
 
   const [matchesRes, groupsRes, membersRes, usersRes] = await Promise.all([
     db().from('matches').select('*').order('scheduled_at', { ascending: true }),
-    db().from('groups').select('id, name, invite_code, created_at').order('created_at', { ascending: true }),
+    db().from('groups').select('id, name, invite_code, image_url, created_at').order('created_at', { ascending: true }),
     db().from('group_members').select('group_id, user_id'),
     db().from('users').select('id, name'),
   ])
@@ -105,8 +105,14 @@ export default async function AdminPage() {
                 const members = memberRows.filter((m) => m.group_id === group.id)
                 return (
                   <div key={group.id} className="bg-gray-800 rounded-2xl p-4 border border-gray-700">
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
+                    <div className="flex items-center gap-3 mb-3">
+                      {group.image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={group.image_url} alt={group.name} className="w-10 h-10 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-xl shrink-0">👥</div>
+                      )}
+                      <div className="flex-1 min-w-0">
                         <p className="text-white font-semibold">{group.name}</p>
                         <p className="text-gray-500 text-xs font-mono">{group.invite_code} · {members.length} members</p>
                       </div>
@@ -116,7 +122,27 @@ export default async function AdminPage() {
                         </button>
                       </form>
                     </div>
-                    <div className="flex flex-col gap-1 mt-3">
+
+                    {/* Image URL form */}
+                    <form
+                      action={async (fd: FormData) => {
+                        'use server'
+                        await setGroupImage(group.id, fd.get('image_url') as string)
+                      }}
+                      className="flex gap-2 mb-3"
+                    >
+                      <input
+                        name="image_url"
+                        defaultValue={group.image_url ?? ''}
+                        placeholder="https://... image URL"
+                        className={`${inputClass} flex-1 text-xs`}
+                      />
+                      <button type="submit" className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded-lg transition-colors shrink-0">
+                        Set
+                      </button>
+                    </form>
+
+                    <div className="flex flex-col gap-1">
                       {members.map((m) => (
                         <div key={m.user_id} className="flex items-center justify-between py-1">
                           <span className="text-gray-300 text-sm truncate">{userMap.get(m.user_id) ?? m.user_id}</span>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { setActiveGroup, createGroup, joinGroup } from '@/app/actions/groups'
 import type { T } from '@/lib/i18n'
 
-type Group = { id: string; name: string; invite_code: string }
+type Group = { id: string; name: string; invite_code: string; image_url?: string | null }
 type Mode = 'list' | 'create' | 'join'
 
 export default function GroupSelector({
@@ -83,6 +83,9 @@ export default function GroupSelector({
         onClick={() => setIsOpen(true)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-800 border border-gray-700 text-sm text-white hover:border-gray-500 transition-colors max-w-[160px]"
       >
+        {activeGroup?.image_url
+          ? <img src={activeGroup.image_url} alt={activeGroup.name} className="w-5 h-5 rounded-full object-cover shrink-0" />
+          : <span className="text-base leading-none">{activeGroup ? '👥' : '🌍'}</span>}
         <span className="truncate">{activeGroup ? activeGroup.name : g.global}</span>
         <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 shrink-0 text-gray-400" stroke="currentColor" strokeWidth={2}>
           <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
@@ -135,7 +138,9 @@ export default function GroupSelector({
                       activeGroup?.id === grp.id ? 'bg-emerald-900/40 text-emerald-400' : 'text-gray-300 hover:bg-gray-800'
                     }`}
                   >
-                    <span className="text-lg">👥</span>
+                    {grp.image_url
+                      ? <img src={grp.image_url} alt={grp.name} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                      : <span className="text-lg">👥</span>}
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{grp.name}</p>
                       <p className="text-xs text-gray-500 font-mono">{grp.invite_code}</p>

@@ -22,8 +22,8 @@ export default async function LeaderboardPage() {
 
   const groupIds = (memberships ?? []).map((m: any) => m.group_id)
 
-  const groups: { id: string; name: string; invite_code: string }[] = groupIds.length
-    ? (await db().from('groups').select('id, name, invite_code').in('id', groupIds)).data ?? []
+  const groups: { id: string; name: string; invite_code: string; image_url?: string | null }[] = groupIds.length
+    ? (await db().from('groups').select('id, name, invite_code, image_url').in('id', groupIds)).data ?? []
     : []
 
   // Active group from cookie (validate membership)
