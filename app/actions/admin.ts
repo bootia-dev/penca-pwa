@@ -74,6 +74,16 @@ export async function deleteMatch(matchId: string) {
   revalidatePath('/admin')
 }
 
+export async function updateGroup(groupId: string, name: string, inviteCode: string) {
+  await requireAdmin()
+  await db()
+    .from('groups')
+    .update({ name: name.trim(), invite_code: inviteCode.toUpperCase().trim() })
+    .eq('id', groupId)
+  revalidatePath('/admin')
+  revalidatePath('/leaderboard')
+}
+
 export async function setGroupImage(groupId: string, imageUrl: string) {
   await requireAdmin()
   await db().from('groups').update({ image_url: imageUrl || null }).eq('id', groupId)

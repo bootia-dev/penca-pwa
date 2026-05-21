@@ -2,7 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/supabase'
 import { getLocale, t } from '@/lib/i18n'
-import { createMatch, setMatchResult, deleteMatch, removeGroupMember, deleteGroup, setGroupImage } from '@/app/actions/admin'
+import { createMatch, setMatchResult, deleteMatch, removeGroupMember, deleteGroup, setGroupImage, updateGroup } from '@/app/actions/admin'
 import Navbar from '@/components/Navbar'
 import type { Match } from '@/types'
 
@@ -105,16 +105,17 @@ export default async function AdminPage() {
                 const members = memberRows.filter((m) => m.group_id === group.id)
                 return (
                   <div key={group.id} className="bg-gray-800 rounded-2xl p-4 border border-gray-700">
-                    <div className="flex items-center gap-3 mb-3">
+                    {/* Header */}
+                    <div className="flex items-center gap-3 mb-4">
                       {group.image_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={group.image_url} alt={group.name} className="w-10 h-10 rounded-full object-cover shrink-0" />
+                        <img src={group.image_url} alt={group.name} className="w-12 h-12 rounded-full object-cover shrink-0" />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-xl shrink-0">👥</div>
+                        <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-2xl shrink-0">👥</div>
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="text-white font-semibold">{group.name}</p>
-                        <p className="text-gray-500 text-xs font-mono">{group.invite_code} · {members.length} members</p>
+                        <p className="text-gray-500 text-xs">{members.length} members</p>
                       </div>
                       <form action={async () => { 'use server'; await deleteGroup(group.id) }}>
                         <button type="submit" className="text-xs text-red-500 hover:text-red-400 transition-colors">
@@ -123,13 +124,34 @@ export default async function AdminPage() {
                       </form>
                     </div>
 
-                    {/* Image URL form */}
+                    {/* Edit name + invite code */}
+                    <form
+                      action={async (fd: FormData) => {
+                        'use server'
+                        await updateGroup(group.id, fd.get('name') as string, fd.get('invite_code') as string)
+                      }}
+                      className="grid grid-cols-2 gap-2 mb-2"
+                    >
+                      <div>
+                        <label className="block text-xs text-gray-400 mb-1">Name</label>
+                        <input name="name" defaultValue={group.name} required className={`${inputClass} text-xs`} />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-400 mb-1">Invite code</label>
+                        <input name="invite_code" defaultValue={group.invite_code} required className={`${inputClass} text-xs font-mono uppercase`} />
+                      </div>
+                      <button type="submit" className="col-span-2 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded-lg transition-colors">
+                        Save name / code
+                      </button>
+                    </form>
+
+                    {/* Image URL */}
                     <form
                       action={async (fd: FormData) => {
                         'use server'
                         await setGroupImage(group.id, fd.get('image_url') as string)
                       }}
-                      className="flex gap-2 mb-3"
+                      className="flex gap-2 mb-4"
                     >
                       <input
                         name="image_url"
@@ -138,13 +160,15 @@ export default async function AdminPage() {
                         className={`${inputClass} flex-1 text-xs`}
                       />
                       <button type="submit" className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded-lg transition-colors shrink-0">
-                        Set
+                        Set image
                       </button>
                     </form>
 
+                    {/* Members */}
+                    <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-2">Members</p>
                     <div className="flex flex-col gap-1">
                       {members.map((m) => (
-                        <div key={m.user_id} className="flex items-center justify-between py-1">
+                        <div key={m.user_id} className="flex items-center justify-between py-1 border-t border-gray-700/50">
                           <span className="text-gray-300 text-sm truncate">{userMap.get(m.user_id) ?? m.user_id}</span>
                           <form action={async () => { 'use server'; await removeGroupMember(group.id, m.user_id) }}>
                             <button type="submit" className="text-xs text-gray-500 hover:text-red-400 transition-colors ml-4 shrink-0">
