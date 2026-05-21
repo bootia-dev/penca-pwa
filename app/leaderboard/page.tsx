@@ -74,6 +74,16 @@ export default async function LeaderboardPage() {
     entryMap.set(p.user_id, entry)
   }
 
+  // When viewing a group, show all members even if they have no predictions yet
+  if (filterUserIds) {
+    for (const id of filterUserIds) {
+      if (!entryMap.has(id)) {
+        const user = users.get(id)
+        if (user) entryMap.set(id, { user_id: id, name: user.name, image: user.image, total_points: 0, predictions_count: 0, exact_scores: 0 })
+      }
+    }
+  }
+
   const rankings = Array.from(entryMap.values()).sort(
     (a, b) => b.total_points - a.total_points || b.exact_scores - a.exact_scores
   )
