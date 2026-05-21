@@ -74,6 +74,28 @@ export async function deleteMatch(matchId: string) {
   revalidatePath('/admin')
 }
 
+export async function uploadGroupImage(groupId: string, formData: FormData) {
+  await requireAdmin()
+
+  const file = formData.get('image') as File
+  if (!file || file.size === 0) return
+
+  const ext = file.name.split('.').pop() ?? 'png'
+  const path = `${groupId}.${ext}`
+
+  const { error: uploadError } = await db().storage
+    .from('group-images')
+    .upload(path, file, { upsert: true, contentType: file.type })
+
+  if (uploadError) throw new Error(uploadError.message)
+
+  const { data: { publicUrl } } = db().storage.from('group-images').getPublicUrl(path)
+
+  await db().from('groups').update({ image_url: publicUrl }).eq('id', groupId)
+  revalidatePath('/admin')
+  revalidatePath('/leaderboard')
+}
+
 export async function updateGroup(groupId: string, name: string, inviteCode: string) {
   await requireAdmin()
   await db()

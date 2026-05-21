@@ -2,7 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/supabase'
 import { getLocale, t } from '@/lib/i18n'
-import { createMatch, setMatchResult, deleteMatch, removeGroupMember, deleteGroup, setGroupImage, updateGroup } from '@/app/actions/admin'
+import { createMatch, setMatchResult, deleteMatch, removeGroupMember, deleteGroup, uploadGroupImage, updateGroup } from '@/app/actions/admin'
 import Navbar from '@/components/Navbar'
 import type { Match } from '@/types'
 
@@ -145,22 +145,22 @@ export default async function AdminPage() {
                       </button>
                     </form>
 
-                    {/* Image URL */}
+                    {/* Image upload */}
                     <form
                       action={async (fd: FormData) => {
                         'use server'
-                        await setGroupImage(group.id, fd.get('image_url') as string)
+                        await uploadGroupImage(group.id, fd)
                       }}
                       className="flex gap-2 mb-4"
                     >
                       <input
-                        name="image_url"
-                        defaultValue={group.image_url ?? ''}
-                        placeholder="https://... image URL"
-                        className={`${inputClass} flex-1 text-xs`}
+                        name="image"
+                        type="file"
+                        accept="image/*,.svg"
+                        className="flex-1 text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-gray-700 file:text-white file:text-xs file:cursor-pointer"
                       />
                       <button type="submit" className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded-lg transition-colors shrink-0">
-                        Set image
+                        Upload
                       </button>
                     </form>
 
