@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 export const translations = {
   en: {
     nav: { admin: 'Admin' },
-    bottomNav: { matches: 'Matches', rankings: 'Rankings', groups: 'Groups', profile: 'Profile' },
+    bottomNav: { matches: 'Matches', rankings: 'Rankings', profile: 'Profile' },
     landing: {
       description: 'Predict World Cup results and compete with friends for the top spot.',
       withGoogle: 'Continue with Google',
@@ -75,6 +75,8 @@ export const translations = {
       wrongPassword: 'Wrong password',
       groupNotFound: 'Group not found',
       alreadyMember: "You're already in this group",
+      global: 'Global',
+      switchGroup: 'Switch group',
     },
     stages: {
       group: 'Group',
@@ -86,7 +88,7 @@ export const translations = {
   },
   es: {
     nav: { admin: 'Admin' },
-    bottomNav: { matches: 'Partidos', rankings: 'Tabla', groups: 'Grupos', profile: 'Perfil' },
+    bottomNav: { matches: 'Partidos', rankings: 'Tabla', profile: 'Perfil' },
     landing: {
       description: 'Predecí los resultados del Mundial y competí con tus amigos.',
       withGoogle: 'Continuar con Google',
@@ -158,6 +160,8 @@ export const translations = {
       wrongPassword: 'Contraseña incorrecta',
       groupNotFound: 'Grupo no encontrado',
       alreadyMember: 'Ya sos parte de este grupo',
+      global: 'Global',
+      switchGroup: 'Cambiar grupo',
     },
     stages: {
       group: 'Fase de grupos',

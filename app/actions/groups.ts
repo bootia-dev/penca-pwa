@@ -2,11 +2,22 @@
 
 import { auth } from '@/auth'
 import { db } from '@/lib/supabase'
+import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import bcrypt from 'bcryptjs'
 
 function makeInviteCode() {
   return Math.random().toString(36).substring(2, 8).toUpperCase()
+}
+
+export async function setActiveGroup(groupId: string | null) {
+  const store = await cookies()
+  if (groupId) {
+    store.set('active_group', groupId, { path: '/', maxAge: 60 * 60 * 24 * 365 })
+  } else {
+    store.delete('active_group')
+  }
+  revalidatePath('/leaderboard')
 }
 
 export async function createGroup(name: string, password: string) {
@@ -27,8 +38,8 @@ export async function createGroup(name: string, password: string) {
 
   await db().from('group_members').insert({ group_id: group.id, user_id: userId })
 
-  revalidatePath('/groups')
-  return { inviteCode }
+  revalidatePath('/leaderboard')
+  return { inviteCode, groupId: group.id as string }
 }
 
 export async function joinGroup(inviteCode: string, password: string) {
@@ -54,6 +65,6 @@ export async function joinGroup(inviteCode: string, password: string) {
   if (memberError?.code === '23505') return { error: 'alreadyMember' as const }
   if (memberError) throw new Error(memberError.message)
 
-  revalidatePath('/groups')
-  return { success: true as const }
+  revalidatePath('/leaderboard')
+  return { success: true as const, groupId: group.id as string }
 }

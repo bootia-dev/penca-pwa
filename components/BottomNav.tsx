@@ -34,20 +34,6 @@ export default function BottomNav({ labels }: Props) {
       ),
     },
     {
-      href: '/groups',
-      label: labels.groups,
-      icon: (active: boolean) => (
-        <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth={active ? 2.5 : 2}>
-          <circle cx="9" cy="7" r="3" strokeLinecap="round" />
-          <circle cx="15" cy="7" r="3" strokeLinecap="round" />
-          <path d="M3 20c0-3.3 2.7-6 6-6" strokeLinecap="round" />
-          <path d="M15 14c3.3 0 6 2.7 6 6" strokeLinecap="round" />
-          <path d="M9 14c1.7 0 3 .9 3 2" strokeLinecap="round" />
-          <path d="M15 14c-1.7 0-3 .9-3 2" strokeLinecap="round" />
-        </svg>
-      ),
-    },
-    {
       href: '/profile',
       label: labels.profile,
       icon: (active: boolean) => (
