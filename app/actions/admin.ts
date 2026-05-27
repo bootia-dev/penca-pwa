@@ -26,7 +26,7 @@ export async function createMatch(formData: FormData) {
     flag_b: formData.get('flag_b') as string,
     stage: formData.get('stage') as string,
     group_name: (formData.get('group_name') as string) || null,
-    scheduled_at: formData.get('scheduled_at') as string,
+    scheduled_at: (formData.get('scheduled_at') as string) + '-03:00',
     status: 'upcoming',
   })
 
