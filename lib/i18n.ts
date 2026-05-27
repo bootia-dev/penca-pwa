@@ -22,9 +22,6 @@ export const translations = {
       noPending: "You're all caught up — no matches left to predict.",
       noPredicted: 'No predictions yet.',
       noMatchesInGroup: 'No matches in this group.',
-      liveNow: 'Live Now',
-      allPicks: 'Predictions',
-      noPicks: 'No predictions yet.',
     },
     leaderboard: {
       title: 'Leaderboard',
@@ -35,6 +32,9 @@ export const translations = {
       you: 'you',
       back: 'Back',
       noFinishedPicks: 'No finished matches yet.',
+      liveNow: 'Live Now',
+      allPicks: 'Predictions',
+      noPicks: 'No predictions yet.',
     },
     profile: {
       signOut: 'Sign out',
@@ -118,9 +118,6 @@ export const translations = {
       noPending: '¡Al día! No quedan partidos por pronosticar.',
       noPredicted: 'Aún no hay pronósticos.',
       noMatchesInGroup: 'No hay partidos en este grupo.',
-      liveNow: 'En Juego',
-      allPicks: 'Pronósticos',
-      noPicks: 'Sin pronósticos aún.',
     },
     leaderboard: {
       title: 'Tabla de posiciones',
@@ -131,6 +128,9 @@ export const translations = {
       you: 'vos',
       back: 'Volver',
       noFinishedPicks: 'No hay partidos finalizados aún.',
+      liveNow: 'En Juego',
+      allPicks: 'Pronósticos',
+      noPicks: 'Sin pronósticos aún.',
     },
     profile: {
       signOut: 'Cerrar sesión',

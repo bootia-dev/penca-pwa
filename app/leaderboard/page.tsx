@@ -38,18 +38,46 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
     filterUserIds = (members ?? []).map((m: any) => m.user_id)
   }
 
-  const [predictionsRes, usersRes] = await Promise.all([
+  const now = new Date()
+
+  const [predictionsRes, usersRes, liveMatchesRes] = await Promise.all([
     filterUserIds
       ? db().from('predictions').select('user_id, points').in('user_id', filterUserIds)
       : db().from('predictions').select('user_id, points'),
     filterUserIds
       ? db().from('users').select('id, name, image').in('id', filterUserIds)
       : db().from('users').select('id, name, image'),
+    db()
+      .from('matches')
+      .select('id, team_a, team_b, flag_a, flag_b, stage, group_name, scheduled_at')
+      .neq('status', 'finished')
+      .lte('scheduled_at', now.toISOString())
+      .order('scheduled_at', { ascending: true }),
   ])
+
+  const liveMatches = liveMatchesRes.data ?? []
+  const liveMatchIds = liveMatches.map((m: any) => m.id)
+
+  const { data: livePredRows } = liveMatchIds.length
+    ? await (filterUserIds
+        ? db().from('predictions').select('user_id, match_id, predicted_a, predicted_b').in('match_id', liveMatchIds).in('user_id', filterUserIds)
+        : db().from('predictions').select('user_id, match_id, predicted_a, predicted_b').in('match_id', liveMatchIds))
+    : { data: [] }
 
   const users = new Map(
     (usersRes.data ?? []).map((u: any) => [u.id, u])
   )
+
+  // Build picks map for live matches (reuse users map — already scoped to group if active)
+  type PickRow = { user_id: string; name: string; image: string | null; predicted_a: number; predicted_b: number }
+  const predsByMatch = new Map<string, PickRow[]>()
+  for (const p of livePredRows ?? []) {
+    const user = users.get(p.user_id)
+    if (!user) continue
+    const arr = predsByMatch.get(p.match_id) ?? []
+    arr.push({ user_id: p.user_id, name: user.name, image: user.image, predicted_a: p.predicted_a, predicted_b: p.predicted_b })
+    predsByMatch.set(p.match_id, arr)
+  }
 
   type Entry = {
     user_id: string; name: string; image: string | null
@@ -96,6 +124,83 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
           <h1 className="text-xl font-bold text-white">{lb.title}</h1>
           <GroupSelector groups={groups} activeGroup={activeGroup} tr={tr} />
         </div>
+
+        {/* Live matches */}
+        {liveMatches.length > 0 && (
+          <section className="mb-6 flex flex-col gap-3">
+            <h2 className="text-white font-semibold flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+              {lb.liveNow}
+            </h2>
+            {liveMatches.map((match: any) => {
+              const picks = (predsByMatch.get(match.id) ?? []).sort(
+                (a, b) => a.user_id === currentUserId ? -1 : b.user_id === currentUserId ? 1 : a.name.localeCompare(b.name)
+              )
+              const stageLabel = tr.stages[match.stage as keyof typeof tr.stages]
+              const groupLabel = match.group_name ? ` ${match.group_name}` : ''
+              return (
+                <div key={match.id} className="bg-gray-800 rounded-2xl border border-red-900/50 overflow-hidden">
+                  {/* Match header */}
+                  <div className="px-4 pt-4 pb-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">{stageLabel}{groupLabel}</span>
+                      <span className="flex items-center gap-1.5 text-xs text-red-400 font-semibold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                        LIVE
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 flex items-center justify-end gap-1.5 min-w-0">
+                        <span className="text-white text-sm font-semibold text-right truncate">{match.team_a}</span>
+                        <span className="text-2xl leading-none shrink-0">{match.flag_a}</span>
+                      </div>
+                      <span className="text-gray-600 text-sm italic shrink-0 w-8 text-center">vs</span>
+                      <div className="flex-1 flex items-center gap-1.5 min-w-0">
+                        <span className="text-2xl leading-none shrink-0">{match.flag_b}</span>
+                        <span className="text-white text-sm font-semibold truncate">{match.team_b}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Picks */}
+                  <div className="border-t border-gray-700/60 px-4 py-3">
+                    <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-2">
+                      {lb.allPicks} ({picks.length})
+                    </p>
+                    {picks.length === 0 ? (
+                      <p className="text-gray-600 text-sm">{lb.noPicks}</p>
+                    ) : (
+                      <div className="flex flex-col divide-y divide-gray-700/40">
+                        {picks.map((pick) => {
+                          const isMe = pick.user_id === currentUserId
+                          return (
+                            <div key={pick.user_id} className={`flex items-center gap-3 py-2 ${isMe ? '-mx-4 px-4 bg-emerald-950/40' : ''}`}>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              {pick.image ? (
+                                <img src={pick.image} alt={pick.name} className="w-7 h-7 rounded-full object-cover shrink-0" />
+                              ) : (
+                                <div className="w-7 h-7 rounded-full bg-gray-600 flex items-center justify-center text-xs font-bold shrink-0 text-white">
+                                  {pick.name[0]}
+                                </div>
+                              )}
+                              <span className={`flex-1 text-sm truncate ${isMe ? 'text-white font-medium' : 'text-gray-300'}`}>
+                                {pick.name}
+                                {isMe && <span className="ml-1.5 text-xs text-emerald-400 font-normal">({lb.you})</span>}
+                              </span>
+                              <span className={`text-base font-bold tabular-nums shrink-0 ${isMe ? 'text-white' : 'text-gray-200'}`}>
+                                {pick.predicted_a} – {pick.predicted_b}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </section>
+        )}
 
         {rankings.length === 0 ? (
           <p className="text-gray-500 text-center mt-20">{lb.noPredictions}</p>
