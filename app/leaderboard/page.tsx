@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar'
 import GroupSelector from '@/components/GroupSelector'
 import Image from 'next/image'
 import Link from 'next/link'
+import Avatar from '@/components/Avatar'
 
 export const revalidate = 0
 
@@ -151,13 +152,13 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 flex items-center justify-end gap-1.5 min-w-0">
-                        <span className="text-white text-sm font-semibold text-right truncate">{match.team_a}</span>
+                        <span className="text-white text-sm font-semibold text-right leading-tight">{match.team_a}</span>
                         <span className="text-2xl leading-none shrink-0">{match.flag_a}</span>
                       </div>
                       <span className="text-gray-600 text-sm italic shrink-0 w-8 text-center">vs</span>
                       <div className="flex-1 flex items-center gap-1.5 min-w-0">
                         <span className="text-2xl leading-none shrink-0">{match.flag_b}</span>
-                        <span className="text-white text-sm font-semibold truncate">{match.team_b}</span>
+                        <span className="text-white text-sm font-semibold leading-tight">{match.team_b}</span>
                       </div>
                     </div>
                   </div>
@@ -175,14 +176,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
                           const isMe = pick.user_id === currentUserId
                           return (
                             <div key={pick.user_id} className={`flex items-center gap-3 py-2 ${isMe ? '-mx-4 px-4 bg-emerald-950/40' : ''}`}>
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              {pick.image ? (
-                                <img src={pick.image} alt={pick.name} className="w-7 h-7 rounded-full object-cover shrink-0" />
-                              ) : (
-                                <div className="w-7 h-7 rounded-full bg-gray-600 flex items-center justify-center text-xs font-bold shrink-0 text-white">
-                                  {pick.name[0]}
-                                </div>
-                              )}
+                              <Avatar src={pick.image} name={pick.name} size={28} />
                               <span className={`flex-1 text-sm truncate ${isMe ? 'text-white font-medium' : 'text-gray-300'}`}>
                                 {pick.name}
                                 {isMe && <span className="ml-1.5 text-xs text-emerald-400 font-normal">({lb.you})</span>}
