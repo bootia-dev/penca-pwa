@@ -29,6 +29,8 @@ export default function DashboardLoading() {
         </div>
       </div>
 
+      {/* Live section (hidden by default, shown when live matches exist) */}
+
       {/* Tab bar */}
       <div className="flex bg-gray-800 rounded-xl p-1 mb-3 gap-1">
         <div className="flex-1 h-9 bg-gray-700 rounded-lg" />
