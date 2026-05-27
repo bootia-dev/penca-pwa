@@ -28,7 +28,7 @@ export async function upsertPrediction(matchId: string, predictedA: number, pred
     .single()
 
   if (match.error || !match.data) throw new Error('Match not found')
-  if (match.data.status !== 'upcoming') throw new Error('Match has already started')
+  if (match.data.status === 'finished') throw new Error('Match already finished')
   if (new Date() >= new Date(match.data.scheduled_at)) throw new Error('Prediction window closed')
 
   const { error } = await db().from('predictions').upsert(

@@ -204,6 +204,10 @@ function MatchAdminCard({ match, tr, stages }: { match: Match; tr: ReturnType<ty
   const stageLabel = match.stage === 'group' && match.group_name
     ? `Group ${match.group_name}`
     : stages[match.stage]
+  const now = new Date()
+  const displayStatus = match.status === 'finished' ? 'finished'
+    : new Date(match.scheduled_at) <= now ? 'live'
+    : 'upcoming'
 
   return (
     <div className="bg-gray-800 rounded-xl p-3 border border-gray-700">
@@ -212,11 +216,11 @@ function MatchAdminCard({ match, tr, stages }: { match: Match; tr: ReturnType<ty
           {match.flag_a} {match.team_a} vs {match.team_b} {match.flag_b}
         </span>
         <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full ${
-          match.status === 'finished' ? 'bg-gray-700 text-gray-400'
-          : match.status === 'live' ? 'bg-red-900 text-red-400'
+          displayStatus === 'finished' ? 'bg-gray-700 text-gray-400'
+          : displayStatus === 'live' ? 'bg-red-900 text-red-400'
           : 'bg-emerald-900/60 text-emerald-400'
         }`}>
-          {match.status}
+          {displayStatus}
         </span>
       </div>
       <p className="text-gray-500 text-xs mb-2">{stageLabel} · {kickoff}</p>

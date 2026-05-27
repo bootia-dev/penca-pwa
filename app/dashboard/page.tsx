@@ -32,10 +32,12 @@ export default async function DashboardPage() {
   }))
 
   const pending = withPredictions.filter(
-    (m) => m.status === 'upcoming' && new Date(m.scheduled_at) > now && !m.prediction
+    (m) => m.status !== 'finished' && new Date(m.scheduled_at) > now && !m.prediction
   )
   const predicted = withPredictions.filter((m) => m.prediction)
-  const liveMatches = withPredictions.filter((m) => m.status === 'live')
+  const liveMatches = withPredictions.filter(
+    (m) => m.status !== 'finished' && new Date(m.scheduled_at) <= now
+  )
 
   // Fetch all users' predictions for live matches
   const liveMatchIds = liveMatches.map((m) => m.id)
