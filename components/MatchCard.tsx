@@ -1,6 +1,7 @@
 'use client'
 
 import PredictionForm from './PredictionForm'
+import LocalTime from './LocalTime'
 import type { MatchWithPrediction } from '@/types'
 import type { T } from '@/lib/i18n'
 
@@ -23,13 +24,6 @@ export default function MatchCard({ match, canPredict, tr }: Props) {
   const stageLabel = tr.stages[match.stage as keyof T['stages']] ?? match.stage
   const groupLabel = match.group_name ? ` ${match.group_name}` : ''
 
-  const kickoff = new Date(match.scheduled_at).toLocaleString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
 
   return (
     <div className="bg-gray-800 rounded-2xl p-4 border border-gray-700">
@@ -38,7 +32,11 @@ export default function MatchCard({ match, canPredict, tr }: Props) {
         <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">
           {stageLabel}{groupLabel}
         </span>
-        <span className="text-xs text-gray-500">{kickoff}</span>
+        <LocalTime
+          date={match.scheduled_at}
+          className="text-xs text-gray-500"
+          options={{ weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }}
+        />
       </div>
 
       {/* Teams + score row */}

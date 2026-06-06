@@ -5,6 +5,7 @@ import { getLocale, t } from '@/lib/i18n'
 import { createMatch, setMatchResult, deleteMatch, removeGroupMember, deleteGroup, uploadGroupImage, updateGroup } from '@/app/actions/admin'
 import Navbar from '@/components/Navbar'
 import AdminTabs from '@/components/AdminTabs'
+import LocalTime from '@/components/LocalTime'
 import type { Match } from '@/types'
 
 export const revalidate = 0
@@ -198,9 +199,6 @@ export default async function AdminPage() {
 }
 
 function MatchAdminCard({ match, tr, stages }: { match: Match; tr: ReturnType<typeof t>['admin']; stages: ReturnType<typeof t>['stages'] }) {
-  const kickoff = new Date(match.scheduled_at).toLocaleString('en-US', {
-    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
-  })
   const stageLabel = match.stage === 'group' && match.group_name
     ? `Group ${match.group_name}`
     : stages[match.stage]
@@ -223,7 +221,9 @@ function MatchAdminCard({ match, tr, stages }: { match: Match; tr: ReturnType<ty
           {displayStatus}
         </span>
       </div>
-      <p className="text-gray-500 text-xs mb-2">{stageLabel} · {kickoff}</p>
+      <p className="text-gray-500 text-xs mb-2">
+        {stageLabel} · <LocalTime date={match.scheduled_at} options={{ month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }} />
+      </p>
 
       {match.status === 'finished' ? (
         <div className="flex items-center justify-between">
