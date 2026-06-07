@@ -169,22 +169,29 @@ export default function DashboardTabs({
               ‹
             </button>
 
-            {/* Date display — transparent input sits on top to capture taps on all devices */}
-            <div className="relative flex-1 flex items-center justify-center gap-2">
-              <span className="text-white font-semibold text-sm pointer-events-none">
-                {mounted && selectedDate ? (
-                  <LocalTime
-                    date={dateRepresentative}
-                    options={{ weekday: 'long', month: 'short', day: 'numeric' }}
-                  />
-                ) : (
-                  <span className="text-gray-600">—</span>
-                )}
-              </span>
-              <svg className="w-4 h-4 text-gray-500 shrink-0 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
+            {/* Date display button — showPicker() opens native calendar on all browsers */}
+            <div className="relative flex-1 flex items-center justify-center">
+              <button
+                onClick={() => {
+                  try { dateInputRef.current?.showPicker() } catch { dateInputRef.current?.click() }
+                }}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-gray-700 transition-colors"
+              >
+                <span className="text-white font-semibold text-sm">
+                  {mounted && selectedDate ? (
+                    <LocalTime
+                      date={dateRepresentative}
+                      options={{ weekday: 'long', month: 'short', day: 'numeric' }}
+                    />
+                  ) : (
+                    <span className="text-gray-600">—</span>
+                  )}
+                </span>
+                <svg className="w-4 h-4 text-gray-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+              </button>
               <input
                 ref={dateInputRef}
                 type="date"
@@ -197,8 +204,7 @@ export default function DashboardTabs({
                   const nearest = dates.find((d) => d >= val) ?? dates[dates.length - 1]
                   setSelectedDate(nearest)
                 }}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                style={{ zIndex: 10 }}
+                className="absolute opacity-0 pointer-events-none w-px h-px"
               />
             </div>
 
