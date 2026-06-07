@@ -1,80 +1,52 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import MatchCard from './MatchCard'
 import LocalTime from './LocalTime'
 import type { MatchWithPrediction } from '@/types'
 import type { T } from '@/lib/i18n'
 
 type StageKey = 'group' | 'round_of_16' | 'quarterfinal' | 'semifinal' | 'final'
-type FilterValue = 'all' | string
 type ViewMode = 'date' | 'group'
 
 const KNOCKOUT_ORDER: StageKey[] = ['round_of_16', 'quarterfinal', 'semifinal', 'final']
 
-function buildFilters(matches: MatchWithPrediction[], stages: T['stages']): { value: FilterValue; label: string }[] {
-  const groupLetters = new Set<string>()
-  const knockoutStages = new Set<StageKey>()
-
-  for (const m of matches) {
-    if (m.stage === 'group' && m.group_name) groupLetters.add(m.group_name)
-    else if (m.stage !== 'group') knockoutStages.add(m.stage as StageKey)
-  }
-
-  const filters: { value: FilterValue; label: string }[] = [{ value: 'all', label: 'All' }]
-  const letters = Array.from(groupLetters).sort()
-  for (const l of letters) filters.push({ value: `group:${l}`, label: `Group ${l}` })
-  for (const s of KNOCKOUT_ORDER) {
-    if (knockoutStages.has(s)) filters.push({ value: `stage:${s}`, label: stages[s] })
-  }
-  return filters
+function uniqueDates(matches: MatchWithPrediction[]): string[] {
+  return Array.from(new Set(matches.map((m) => m.scheduled_at.slice(0, 10)))).sort()
 }
 
-function applyFilter(matches: MatchWithPrediction[], filter: FilterValue): MatchWithPrediction[] {
-  if (filter === 'all') return matches
-  if (filter.startsWith('group:')) {
-    const letter = filter.slice(6)
-    return matches.filter((m) => m.stage === 'group' && m.group_name === letter)
-  }
-  if (filter.startsWith('stage:')) {
-    const stage = filter.slice(6)
-    return matches.filter((m) => m.stage === stage)
-  }
-  return matches
+function nearestDate(dates: string[]): string {
+  if (!dates.length) return ''
+  const today = new Date().toISOString().slice(0, 10)
+  return dates.find((d) => d >= today) ?? dates[dates.length - 1]
 }
 
-function groupByDate(matches: MatchWithPrediction[]): { key: string; matches: MatchWithPrediction[] }[] {
-  const map = new Map<string, MatchWithPrediction[]>()
-  for (const m of matches) {
-    const key = m.scheduled_at.slice(0, 10)
-    const arr = map.get(key) ?? []
-    arr.push(m)
-    map.set(key, arr)
-  }
-  return Array.from(map.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, ms]) => ({ key, matches: ms }))
-}
-
-function groupByStage(matches: MatchWithPrediction[], stages: T['stages']): { key: string; label: string; matches: MatchWithPrediction[] }[] {
-  const map = new Map<string, { label: string; matches: MatchWithPrediction[] }>()
+function stageGroups(matches: MatchWithPrediction[], stages: T['stages']): { key: string; label: string }[] {
+  const seen = new Map<string, string>()
   for (const m of matches) {
     const key = m.stage === 'group' ? `group:${m.group_name}` : m.stage
-    if (!map.has(key)) {
+    if (!seen.has(key)) {
       const label = m.stage === 'group' ? `Group ${m.group_name}` : stages[m.stage as StageKey]
-      map.set(key, { label, matches: [] })
+      seen.set(key, label)
     }
-    map.get(key)!.matches.push(m)
   }
-  const result: { key: string; label: string; matches: MatchWithPrediction[] }[] = []
-  Array.from(map.entries())
+  const result: { key: string; label: string }[] = []
+  Array.from(seen.entries())
     .filter(([k]) => k.startsWith('group:'))
     .sort(([a], [b]) => a.localeCompare(b))
-    .forEach(([key, val]) => result.push({ key, ...val }))
+    .forEach(([key, label]) => result.push({ key, label }))
   for (const s of KNOCKOUT_ORDER) {
-    if (map.has(s)) result.push({ key: s, ...map.get(s)! })
+    if (seen.has(s)) result.push({ key: s, label: seen.get(s)! })
   }
   return result
+}
+
+function filterByGroup(matches: MatchWithPrediction[], groupKey: string): MatchWithPrediction[] {
+  if (groupKey.startsWith('group:')) {
+    const letter = groupKey.slice(6)
+    return matches.filter((m) => m.stage === 'group' && m.group_name === letter)
+  }
+  return matches.filter((m) => m.stage === groupKey)
 }
 
 export default function DashboardTabs({
@@ -91,18 +63,37 @@ export default function DashboardTabs({
   const [tab, setTab] = useState<'pending' | 'predicted'>(
     pending.length > 0 ? 'pending' : 'predicted'
   )
-  const [filter, setFilter] = useState<FilterValue>('all')
   const [viewMode, setViewMode] = useState<ViewMode>('date')
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const activeList = tab === 'pending' ? pending : predicted
+
+  // Date view state
+  const dates = uniqueDates(activeList)
+  const [selectedDate, setSelectedDate] = useState(() => nearestDate(uniqueDates(
+    pending.length > 0 ? pending : predicted
+  )))
+  const dateInputRef = useRef<HTMLInputElement>(null)
+
+  // Group view state
+  const groups = stageGroups(allMatches, tr.stages)
+  const [selectedGroup, setSelectedGroup] = useState(() => groups[0]?.key ?? '')
+
+  // Reset selected date when tab changes
+  useEffect(() => {
+    const newDates = uniqueDates(activeList)
+    if (!newDates.includes(selectedDate)) {
+      setSelectedDate(nearestDate(newDates))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab])
+
   const now = new Date()
   const d = tr.dashboard
 
-  const filters = buildFilters(allMatches, tr.stages)
-  const activeList = tab === 'pending' ? pending : predicted
-  const visible = applyFilter(activeList, filter)
-
-  const dateSections = groupByDate(visible)
-  const stageSections = groupByStage(visible, tr.stages)
+  const dateIdx = dates.indexOf(selectedDate)
+  const prevDate = dateIdx > 0 ? dates[dateIdx - 1] : null
+  const nextDate = dateIdx < dates.length - 1 ? dates[dateIdx + 1] : null
+  const matchesOnDate = activeList.filter((m) => m.scheduled_at.startsWith(selectedDate))
+  const matchesInGroup = selectedGroup ? filterByGroup(activeList, selectedGroup) : activeList
 
   return (
     <div>
@@ -133,35 +124,12 @@ export default function DashboardTabs({
         })}
       </div>
 
-      {/* Filter pills + view mode toggle */}
-      <div className="flex items-center gap-2 mb-4">
-        {filters.length > 1 && (
-          <div
-            ref={scrollRef}
-            className="flex gap-2 overflow-x-auto flex-1 scrollbar-none"
-            style={{ scrollbarWidth: 'none' }}
-          >
-            {filters.map((f) => (
-              <button
-                key={f.value}
-                onClick={() => setFilter(f.value)}
-                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
-                  filter === f.value
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-gray-800 border border-gray-700 text-gray-400 hover:text-gray-200 hover:border-gray-500'
-                }`}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* View mode toggle */}
-        <div className="flex shrink-0 bg-gray-800 border border-gray-700 rounded-lg p-0.5">
+      {/* View mode toggle */}
+      <div className="flex justify-end mb-3">
+        <div className="flex bg-gray-800 border border-gray-700 rounded-lg p-0.5">
           <button
             onClick={() => setViewMode('date')}
-            className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
               viewMode === 'date' ? 'bg-gray-700 text-white' : 'text-gray-500 hover:text-gray-300'
             }`}
           >
@@ -169,7 +137,7 @@ export default function DashboardTabs({
           </button>
           <button
             onClick={() => setViewMode('group')}
-            className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
               viewMode === 'group' ? 'bg-gray-700 text-white' : 'text-gray-500 hover:text-gray-300'
             }`}
           >
@@ -178,55 +146,104 @@ export default function DashboardTabs({
         </div>
       </div>
 
-      {visible.length === 0 ? (
-        <p className="text-gray-500 text-center mt-20">
-          {activeList.length === 0
-            ? tab === 'pending' ? d.noPending : d.noPredicted
-            : d.noMatchesInGroup}
-        </p>
-      ) : viewMode === 'date' ? (
-        <div className="flex flex-col gap-6">
-          {dateSections.map(({ key, matches: sMatches }) => (
-            <div key={key}>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                <LocalTime
-                  date={`${key}T12:00:00Z`}
-                  options={{ weekday: 'long', month: 'short', day: 'numeric' }}
+      {viewMode === 'date' ? (
+        <>
+          {/* Date navigator */}
+          <div className="flex items-center gap-2 mb-4">
+            <button
+              onClick={() => prevDate && setSelectedDate(prevDate)}
+              disabled={!prevDate}
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-800 border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-lg"
+            >
+              ‹
+            </button>
+
+            {/* Date label — clicking opens native date picker */}
+            <label className="relative flex-1 flex items-center justify-center gap-2 cursor-pointer">
+              <span className="text-white font-semibold text-sm">
+                {selectedDate
+                  ? <LocalTime date={`${selectedDate}T12:00:00Z`} options={{ weekday: 'long', month: 'short', day: 'numeric' }} />
+                  : '—'}
+              </span>
+              <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+              <input
+                ref={dateInputRef}
+                type="date"
+                value={selectedDate}
+                min={dates[0]}
+                max={dates[dates.length - 1]}
+                onChange={(e) => {
+                  const val = e.target.value
+                  if (!val) return
+                  // Snap to nearest date with matches
+                  const nearest = dates.find((d) => d >= val) ?? dates[dates.length - 1]
+                  setSelectedDate(nearest)
+                }}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full"
+              />
+            </label>
+
+            <button
+              onClick={() => nextDate && setSelectedDate(nextDate)}
+              disabled={!nextDate}
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-800 border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-lg"
+            >
+              ›
+            </button>
+          </div>
+
+          {matchesOnDate.length === 0 ? (
+            <p className="text-gray-500 text-center mt-20">
+              {activeList.length === 0 ? (tab === 'pending' ? d.noPending : d.noPredicted) : d.noMatchesInGroup}
+            </p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {matchesOnDate.map((match) => (
+                <MatchCard
+                  key={match.id}
+                  match={match}
+                  canPredict={tab === 'pending' && new Date(match.scheduled_at) > now}
+                  tr={tr}
                 />
-              </p>
-              <div className="flex flex-col gap-3">
-                {sMatches.map((match) => (
-                  <MatchCard
-                    key={match.id}
-                    match={match}
-                    canPredict={tab === 'pending' && new Date(match.scheduled_at) > now}
-                    tr={tr}
-                  />
-                ))}
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       ) : (
-        <div className="flex flex-col gap-6">
-          {stageSections.map(({ key, label, matches: sMatches }) => (
-            <div key={key}>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                {label}
-              </p>
-              <div className="flex flex-col gap-3">
-                {sMatches.map((match) => (
-                  <MatchCard
-                    key={match.id}
-                    match={match}
-                    canPredict={tab === 'pending' && new Date(match.scheduled_at) > now}
-                    tr={tr}
-                  />
-                ))}
-              </div>
+        <>
+          {/* Group / stage dropdown */}
+          <div className="mb-4">
+            <select
+              value={selectedGroup}
+              onChange={(e) => setSelectedGroup(e.target.value)}
+              className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              {groups.map((g) => (
+                <option key={g.key} value={g.key}>{g.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {matchesInGroup.length === 0 ? (
+            <p className="text-gray-500 text-center mt-20">
+              {activeList.length === 0 ? (tab === 'pending' ? d.noPending : d.noPredicted) : d.noMatchesInGroup}
+            </p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {matchesInGroup.map((match) => (
+                <MatchCard
+                  key={match.id}
+                  match={match}
+                  canPredict={tab === 'pending' && new Date(match.scheduled_at) > now}
+                  tr={tr}
+                />
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   )
