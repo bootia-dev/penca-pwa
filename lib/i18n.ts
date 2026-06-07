@@ -22,6 +22,8 @@ export const translations = {
       noPending: "You're all caught up — no matches left to predict.",
       noPredicted: 'No predictions yet.',
       noMatchesInGroup: 'No matches in this group.',
+      viewByDate: 'By date',
+      viewByGroup: 'By group',
     },
     leaderboard: {
       title: 'Leaderboard',
@@ -118,6 +120,8 @@ export const translations = {
       noPending: '¡Al día! No quedan partidos por pronosticar.',
       noPredicted: 'Aún no hay pronósticos.',
       noMatchesInGroup: 'No hay partidos en este grupo.',
+      viewByDate: 'Por fecha',
+      viewByGroup: 'Por grupo',
     },
     leaderboard: {
       title: 'Tabla de posiciones',
