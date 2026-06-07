@@ -210,7 +210,7 @@ export default function DashboardTabs({
             </button>
           </div>
 
-          <TimezoneNote className="text-xs text-gray-600 text-center mb-3" />
+          <TimezoneNote className="text-xs text-gray-600 text-center mb-3" prefix={d.allTimesIn} />
 
           {!mounted ? null : matchesOnDate.length === 0 ? (
             <p className="text-gray-500 text-center mt-20">

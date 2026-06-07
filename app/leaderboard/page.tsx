@@ -127,7 +127,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
           <GroupSelector groups={groups} activeGroup={activeGroup} tr={tr} />
         </div>
 
-        <TimezoneNote className="text-xs text-gray-600 text-center mb-4" />
+        <TimezoneNote className="text-xs text-gray-600 text-center mb-4" prefix={lb.allTimesIn} />
 
         {/* Live matches */}
         {liveMatches.length > 0 && (

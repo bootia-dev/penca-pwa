@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
-export default function TimezoneNote({ className }: { className?: string }) {
+export default function TimezoneNote({ className, prefix = 'All times in' }: { className?: string; prefix?: string }) {
   const [label, setLabel] = useState('')
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function TimezoneNote({ className }: { className?: string }) {
 
   return (
     <p className={className ?? 'text-xs text-gray-600 text-center'}>
-      All times in {label}
+      {prefix} {label}
     </p>
   )
 }

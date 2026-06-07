@@ -24,6 +24,7 @@ export const translations = {
       noMatchesInGroup: 'No matches in this group.',
       viewByDate: 'By date',
       viewByGroup: 'By group',
+      allTimesIn: 'All times in',
     },
     leaderboard: {
       title: 'Leaderboard',
@@ -37,6 +38,7 @@ export const translations = {
       liveNow: 'Live Now',
       allPicks: 'Predictions',
       noPicks: 'No predictions yet.',
+      allTimesIn: 'All times in',
     },
     profile: {
       signOut: 'Sign out',
@@ -122,6 +124,7 @@ export const translations = {
       noMatchesInGroup: 'No hay partidos en este grupo.',
       viewByDate: 'Por fecha',
       viewByGroup: 'Por grupo',
+      allTimesIn: 'Todos los horarios en',
     },
     leaderboard: {
       title: 'Tabla de posiciones',
@@ -135,6 +138,7 @@ export const translations = {
       liveNow: 'En Juego',
       allPicks: 'Pronósticos',
       noPicks: 'Sin pronósticos aún.',
+      allTimesIn: 'Todos los horarios en',
     },
     profile: {
       signOut: 'Cerrar sesión',
