@@ -182,6 +182,7 @@ export default function DashboardTabs({
                     <LocalTime
                       date={dateRepresentative}
                       options={{ weekday: 'long', month: 'short', day: 'numeric' }}
+                      locale={tr.locale}
                     />
                   ) : (
                     <span className="text-gray-600">—</span>

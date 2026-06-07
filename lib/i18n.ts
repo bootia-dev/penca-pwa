@@ -204,7 +204,7 @@ export const translations = {
 } as const
 
 export type Locale = keyof typeof translations
-export type T = typeof translations.en
+export type T = typeof translations.en & { locale: Locale }
 
 export async function getLocale(): Promise<Locale> {
   const store = await cookies()
@@ -213,5 +213,5 @@ export async function getLocale(): Promise<Locale> {
 }
 
 export function t(locale: Locale): T {
-  return translations[locale] as unknown as T
+  return { ...(translations[locale] as unknown as typeof translations.en), locale }
 }

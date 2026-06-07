@@ -87,7 +87,7 @@ export default async function AdminPage() {
         ) : (
           <div className="flex flex-col gap-2">
             {(matches as Match[]).map((match) => (
-              <MatchAdminCard key={match.id} match={match} tr={tr} stages={stages} />
+              <MatchAdminCard key={match.id} match={match} tr={tr} stages={stages} locale={locale} />
             ))}
           </div>
         )}
@@ -198,7 +198,7 @@ export default async function AdminPage() {
   )
 }
 
-function MatchAdminCard({ match, tr, stages }: { match: Match; tr: ReturnType<typeof t>['admin']; stages: ReturnType<typeof t>['stages'] }) {
+function MatchAdminCard({ match, tr, stages, locale }: { match: Match; tr: ReturnType<typeof t>['admin']; stages: ReturnType<typeof t>['stages']; locale: string }) {
   const stageLabel = match.stage === 'group' && match.group_name
     ? `Group ${match.group_name}`
     : stages[match.stage]
@@ -222,7 +222,7 @@ function MatchAdminCard({ match, tr, stages }: { match: Match; tr: ReturnType<ty
         </span>
       </div>
       <p className="text-gray-500 text-xs mb-2">
-        {stageLabel} · <LocalTime date={match.scheduled_at} options={{ month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }} />
+        {stageLabel} · <LocalTime date={match.scheduled_at} options={{ month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }} locale={locale} />
       </p>
 
       {match.status === 'finished' ? (

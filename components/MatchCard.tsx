@@ -36,6 +36,7 @@ export default function MatchCard({ match, canPredict, tr }: Props) {
           date={match.scheduled_at}
           className="text-xs text-gray-500"
           options={{ weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }}
+          locale={tr.locale}
         />
       </div>
 
