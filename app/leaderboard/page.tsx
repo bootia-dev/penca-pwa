@@ -6,6 +6,7 @@ import GroupSelector from '@/components/GroupSelector'
 import Image from 'next/image'
 import Link from 'next/link'
 import Avatar from '@/components/Avatar'
+import TimezoneNote from '@/components/TimezoneNote'
 
 export const revalidate = 0
 
@@ -125,6 +126,8 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
           <h1 className="text-xl font-bold text-white">{lb.title}</h1>
           <GroupSelector groups={groups} activeGroup={activeGroup} tr={tr} />
         </div>
+
+        <TimezoneNote className="text-xs text-gray-600 text-center mb-4" />
 
         {/* Live matches */}
         {liveMatches.length > 0 && (

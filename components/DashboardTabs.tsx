@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import MatchCard from './MatchCard'
 import LocalTime from './LocalTime'
+import TimezoneNote from './TimezoneNote'
 import type { MatchWithPrediction } from '@/types'
 import type { T } from '@/lib/i18n'
 
@@ -208,6 +209,8 @@ export default function DashboardTabs({
               ›
             </button>
           </div>
+
+          <TimezoneNote className="text-xs text-gray-600 text-center mb-3" />
 
           {!mounted ? null : matchesOnDate.length === 0 ? (
             <p className="text-gray-500 text-center mt-20">
