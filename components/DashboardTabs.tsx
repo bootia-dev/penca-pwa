@@ -11,13 +11,18 @@ type ViewMode = 'date' | 'group'
 
 const KNOCKOUT_ORDER: StageKey[] = ['round_of_16', 'quarterfinal', 'semifinal', 'final']
 
-function uniqueDates(matches: MatchWithPrediction[]): string[] {
-  return Array.from(new Set(matches.map((m) => m.scheduled_at.slice(0, 10)))).sort()
+// en-CA gives YYYY-MM-DD in the browser's local timezone — sortable and correct
+function localDateKey(scheduledAt: string): string {
+  return new Date(scheduledAt).toLocaleDateString('en-CA')
+}
+
+function uniqueLocalDates(matches: MatchWithPrediction[]): string[] {
+  return Array.from(new Set(matches.map((m) => localDateKey(m.scheduled_at)))).sort()
 }
 
 function nearestDate(dates: string[]): string {
   if (!dates.length) return ''
-  const today = new Date().toISOString().slice(0, 10)
+  const today = new Date().toLocaleDateString('en-CA')
   return dates.find((d) => d >= today) ?? dates[dates.length - 1]
 }
 
@@ -26,8 +31,7 @@ function stageGroups(matches: MatchWithPrediction[], stages: T['stages']): { key
   for (const m of matches) {
     const key = m.stage === 'group' ? `group:${m.group_name}` : m.stage
     if (!seen.has(key)) {
-      const label = m.stage === 'group' ? `Group ${m.group_name}` : stages[m.stage as StageKey]
-      seen.set(key, label)
+      seen.set(key, m.stage === 'group' ? `Group ${m.group_name}` : stages[m.stage as StageKey])
     }
   }
   const result: { key: string; label: string }[] = []
@@ -64,36 +68,42 @@ export default function DashboardTabs({
     pending.length > 0 ? 'pending' : 'predicted'
   )
   const [viewMode, setViewMode] = useState<ViewMode>('date')
-  const activeList = tab === 'pending' ? pending : predicted
-
-  // Date view state
-  const dates = uniqueDates(activeList)
-  const [selectedDate, setSelectedDate] = useState(() => nearestDate(uniqueDates(
-    pending.length > 0 ? pending : predicted
-  )))
+  // selectedDate uses empty string until mounted so server/client HTML matches
+  const [selectedDate, setSelectedDate] = useState('')
+  const [mounted, setMounted] = useState(false)
   const dateInputRef = useRef<HTMLInputElement>(null)
 
-  // Group view state
-  const groups = stageGroups(allMatches, tr.stages)
-  const [selectedGroup, setSelectedGroup] = useState(() => groups[0]?.key ?? '')
+  const activeList = tab === 'pending' ? pending : predicted
 
-  // Reset selected date when tab changes
+  // After mount, compute correct local-timezone dates and set initial selection
   useEffect(() => {
-    const newDates = uniqueDates(activeList)
-    if (!newDates.includes(selectedDate)) {
-      setSelectedDate(nearestDate(newDates))
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab])
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+    const dates = uniqueLocalDates(activeList)
+    setSelectedDate((prev) => dates.includes(prev) ? prev : nearestDate(dates))
+  }, [mounted, tab, pending, predicted])
 
   const now = new Date()
   const d = tr.dashboard
+  const groups = stageGroups(allMatches, tr.stages)
+  const [selectedGroup, setSelectedGroup] = useState(() => groups[0]?.key ?? '')
 
+  // Derive dates and visible matches using local timezone (only after mount)
+  const dates = mounted ? uniqueLocalDates(activeList) : []
   const dateIdx = dates.indexOf(selectedDate)
   const prevDate = dateIdx > 0 ? dates[dateIdx - 1] : null
   const nextDate = dateIdx < dates.length - 1 ? dates[dateIdx + 1] : null
-  const matchesOnDate = activeList.filter((m) => m.scheduled_at.startsWith(selectedDate))
+  const matchesOnDate = mounted
+    ? activeList.filter((m) => localDateKey(m.scheduled_at) === selectedDate)
+    : []
+
   const matchesInGroup = selectedGroup ? filterByGroup(activeList, selectedGroup) : activeList
+
+  // Representative scheduled_at for the selected date (for LocalTime display)
+  const dateRepresentative = matchesOnDate[0]?.scheduled_at ?? `${selectedDate}T12:00:00Z`
 
   return (
     <div>
@@ -158,14 +168,19 @@ export default function DashboardTabs({
               ‹
             </button>
 
-            {/* Date label — clicking opens native date picker */}
+            {/* Clicking the date opens the native date picker */}
             <label className="relative flex-1 flex items-center justify-center gap-2 cursor-pointer">
               <span className="text-white font-semibold text-sm">
-                {selectedDate
-                  ? <LocalTime date={`${selectedDate}T12:00:00Z`} options={{ weekday: 'long', month: 'short', day: 'numeric' }} />
-                  : '—'}
+                {mounted && selectedDate ? (
+                  <LocalTime
+                    date={dateRepresentative}
+                    options={{ weekday: 'long', month: 'short', day: 'numeric' }}
+                  />
+                ) : (
+                  <span className="text-gray-600">—</span>
+                )}
               </span>
-              <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-4 h-4 text-gray-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                 <line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
               </svg>
@@ -178,7 +193,6 @@ export default function DashboardTabs({
                 onChange={(e) => {
                   const val = e.target.value
                   if (!val) return
-                  // Snap to nearest date with matches
                   const nearest = dates.find((d) => d >= val) ?? dates[dates.length - 1]
                   setSelectedDate(nearest)
                 }}
@@ -195,9 +209,11 @@ export default function DashboardTabs({
             </button>
           </div>
 
-          {matchesOnDate.length === 0 ? (
+          {!mounted ? null : matchesOnDate.length === 0 ? (
             <p className="text-gray-500 text-center mt-20">
-              {activeList.length === 0 ? (tab === 'pending' ? d.noPending : d.noPredicted) : d.noMatchesInGroup}
+              {activeList.length === 0
+                ? tab === 'pending' ? d.noPending : d.noPredicted
+                : d.noMatchesInGroup}
             </p>
           ) : (
             <div className="flex flex-col gap-3">
@@ -229,7 +245,9 @@ export default function DashboardTabs({
 
           {matchesInGroup.length === 0 ? (
             <p className="text-gray-500 text-center mt-20">
-              {activeList.length === 0 ? (tab === 'pending' ? d.noPending : d.noPredicted) : d.noMatchesInGroup}
+              {activeList.length === 0
+                ? tab === 'pending' ? d.noPending : d.noPredicted
+                : d.noMatchesInGroup}
             </p>
           ) : (
             <div className="flex flex-col gap-3">
