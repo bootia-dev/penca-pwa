@@ -2,7 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/supabase'
 import { getLocale, t } from '@/lib/i18n'
-import { createMatch, setMatchResult, deleteMatch, removeGroupMember, deleteGroup, uploadGroupImage, updateGroup, addGroupMember } from '@/app/actions/admin'
+import { createMatch, setMatchResult, deleteMatch, removeGroupMember, deleteGroup, uploadGroupImage, updateGroup, addGroupMember, createGroup } from '@/app/actions/admin'
 import Navbar from '@/components/Navbar'
 import AdminTabs from '@/components/AdminTabs'
 import LocalTime from '@/components/LocalTime'
@@ -97,6 +97,23 @@ export default async function AdminPage() {
 
   const groupsContent = (
     <section>
+      <div className="mb-6 bg-gray-800 rounded-2xl p-5 border border-gray-700">
+        <h2 className="text-white font-semibold mb-4">Create Group</h2>
+        <form action={createGroup} className="flex flex-col gap-3">
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Group name</label>
+            <input name="name" required placeholder="My group" className={inputClass} />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Invite code</label>
+            <input name="invite_code" required placeholder="MYCODE" className={`${inputClass} uppercase`} />
+          </div>
+          <button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-lg transition-colors">
+            Create Group
+          </button>
+        </form>
+      </div>
+
       <h2 className="text-white font-semibold mb-3">{tr.allGroups}</h2>
       {groups.length === 0 ? (
         <p className="text-gray-500">{tr.noGroups}</p>

@@ -113,6 +113,19 @@ export async function setGroupImage(groupId: string, imageUrl: string) {
   revalidatePath('/leaderboard')
 }
 
+export async function createGroup(formData: FormData) {
+  await requireAdmin()
+
+  const name = (formData.get('name') as string)?.trim()
+  const inviteCode = (formData.get('invite_code') as string)?.trim().toUpperCase()
+  if (!name || !inviteCode) throw new Error('Name and invite code required')
+
+  const { error } = await db().from('groups').insert({ name, invite_code: inviteCode })
+  if (error) throw new Error(error.message)
+  revalidatePath('/admin')
+  revalidatePath('/leaderboard')
+}
+
 export async function addGroupMember(groupId: string, formData: FormData) {
   await requireAdmin()
 
