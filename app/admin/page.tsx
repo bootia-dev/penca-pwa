@@ -104,6 +104,8 @@ export default async function AdminPage() {
         <div className="flex flex-col gap-3">
           {groups.map((group: any) => {
             const members = memberRows.filter((m) => m.group_id === group.id)
+            const memberIds = new Set(members.map((m) => m.user_id))
+            const nonMembers = (usersRes.data ?? []).filter((u: any) => !memberIds.has(u.id))
             return (
               <div key={group.id} className="bg-gray-800 rounded-2xl p-4 border border-gray-700">
                 {/* Header */}
@@ -166,24 +168,25 @@ export default async function AdminPage() {
                 </form>
 
                 {/* Add member */}
-                <form
-                  action={async (fd: FormData) => {
-                    'use server'
-                    await addGroupMember(group.id, fd)
-                  }}
-                  className="flex gap-2 mb-4"
-                >
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="user@email.com"
-                    className={`${inputClass} flex-1 text-xs`}
-                  />
-                  <button type="submit" className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium rounded-lg transition-colors shrink-0">
-                    Add
-                  </button>
-                </form>
+                {nonMembers.length > 0 && (
+                  <form
+                    action={async (fd: FormData) => {
+                      'use server'
+                      await addGroupMember(group.id, fd)
+                    }}
+                    className="flex gap-2 mb-4"
+                  >
+                    <select name="email" required className={`${inputClass} flex-1 text-xs`}>
+                      <option value="">Select user…</option>
+                      {nonMembers.map((u: any) => (
+                        <option key={u.id} value={u.id}>{u.name} ({u.id})</option>
+                      ))}
+                    </select>
+                    <button type="submit" className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium rounded-lg transition-colors shrink-0">
+                      Add
+                    </button>
+                  </form>
+                )}
 
                 {/* Members */}
                 <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-2">Members</p>
