@@ -113,6 +113,28 @@ export async function setGroupImage(groupId: string, imageUrl: string) {
   revalidatePath('/leaderboard')
 }
 
+export async function addGroupMember(groupId: string, formData: FormData) {
+  await requireAdmin()
+
+  const email = (formData.get('email') as string)?.trim().toLowerCase()
+  if (!email) throw new Error('Email required')
+
+  const { data: user } = await db().from('users').select('id').eq('id', email).single()
+  if (!user) throw new Error('User not found')
+
+  const { data: existing } = await db()
+    .from('group_members')
+    .select('user_id')
+    .eq('group_id', groupId)
+    .eq('user_id', email)
+    .single()
+  if (existing) throw new Error('Already a member')
+
+  const { error } = await db().from('group_members').insert({ group_id: groupId, user_id: email })
+  if (error) throw new Error(error.message)
+  revalidatePath('/admin')
+}
+
 export async function removeGroupMember(groupId: string, userId: string) {
   await requireAdmin()
   await db().from('group_members').delete().eq('group_id', groupId).eq('user_id', userId)

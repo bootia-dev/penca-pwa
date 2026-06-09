@@ -2,7 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/supabase'
 import { getLocale, t } from '@/lib/i18n'
-import { createMatch, setMatchResult, deleteMatch, removeGroupMember, deleteGroup, uploadGroupImage, updateGroup } from '@/app/actions/admin'
+import { createMatch, setMatchResult, deleteMatch, removeGroupMember, deleteGroup, uploadGroupImage, updateGroup, addGroupMember } from '@/app/actions/admin'
 import Navbar from '@/components/Navbar'
 import AdminTabs from '@/components/AdminTabs'
 import LocalTime from '@/components/LocalTime'
@@ -162,6 +162,26 @@ export default async function AdminPage() {
                   />
                   <button type="submit" className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded-lg transition-colors shrink-0">
                     Upload
+                  </button>
+                </form>
+
+                {/* Add member */}
+                <form
+                  action={async (fd: FormData) => {
+                    'use server'
+                    await addGroupMember(group.id, fd)
+                  }}
+                  className="flex gap-2 mb-4"
+                >
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="user@email.com"
+                    className={`${inputClass} flex-1 text-xs`}
+                  />
+                  <button type="submit" className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium rounded-lg transition-colors shrink-0">
+                    Add
                   </button>
                 </form>
 
