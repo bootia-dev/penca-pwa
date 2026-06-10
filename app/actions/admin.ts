@@ -115,7 +115,7 @@ export async function setGroupImage(groupId: string, imageUrl: string) {
 }
 
 export async function createGroup(formData: FormData) {
-  await requireAdmin()
+  const session = await requireAdmin()
 
   const name = (formData.get('name') as string)?.trim()
   const inviteCode = (formData.get('invite_code') as string)?.trim().toUpperCase()
@@ -123,7 +123,12 @@ export async function createGroup(formData: FormData) {
   if (!name || !inviteCode || !password) throw new Error('Name, invite code and password required')
 
   const passwordHash = await bcrypt.hash(password, 10)
-  const { error } = await db().from('groups').insert({ name, invite_code: inviteCode, password_hash: passwordHash })
+  const { error } = await db().from('groups').insert({
+    name,
+    invite_code: inviteCode,
+    password_hash: passwordHash,
+    created_by: session.user!.email!,
+  })
   if (error) throw new Error(error.message)
   revalidatePath('/admin')
   revalidatePath('/leaderboard')
