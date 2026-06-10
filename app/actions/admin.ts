@@ -2,6 +2,7 @@
 
 import { auth } from '@/auth'
 import { db } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 import { calculatePoints } from '@/lib/scoring'
 import { revalidatePath } from 'next/cache'
 import bcrypt from 'bcryptjs'
@@ -87,19 +88,19 @@ export async function uploadGroupImage(groupId: string, formData: FormData) {
   // Convert File to Buffer — more reliable in serverless than passing the File object directly
   const buffer = Buffer.from(await file.arrayBuffer())
 
-  const { createClient } = await import('@supabase/supabase-js')
-  const storage = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  ).storage
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  console.log('upload: url set?', !!supabaseUrl, 'key length:', serviceKey?.length ?? 0)
+
+  const storage = createClient(supabaseUrl, serviceKey).storage
 
   const { error: uploadError } = await storage
     .from('group-images')
     .upload(path, buffer, { upsert: true, contentType: file.type })
 
   if (uploadError) {
-    console.error('Storage upload error:', uploadError)
-    throw new Error(uploadError.message)
+    console.error('Storage upload error:', JSON.stringify(uploadError))
+    throw new Error(`Upload failed: ${uploadError.message}`)
   }
 
   const { data: { publicUrl } } = storage.from('group-images').getPublicUrl(path)
