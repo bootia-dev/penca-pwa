@@ -84,13 +84,25 @@ export async function uploadGroupImage(groupId: string, formData: FormData) {
   const ext = file.name.split('.').pop() ?? 'png'
   const path = `${groupId}.${ext}`
 
-  const { error: uploadError } = await db().storage
+  // Convert File to Buffer — more reliable in serverless than passing the File object directly
+  const buffer = Buffer.from(await file.arrayBuffer())
+
+  const { createClient } = await import('@supabase/supabase-js')
+  const storage = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  ).storage
+
+  const { error: uploadError } = await storage
     .from('group-images')
-    .upload(path, file, { upsert: true, contentType: file.type })
+    .upload(path, buffer, { upsert: true, contentType: file.type })
 
-  if (uploadError) throw new Error(uploadError.message)
+  if (uploadError) {
+    console.error('Storage upload error:', uploadError)
+    throw new Error(uploadError.message)
+  }
 
-  const { data: { publicUrl } } = db().storage.from('group-images').getPublicUrl(path)
+  const { data: { publicUrl } } = storage.from('group-images').getPublicUrl(path)
 
   await db().from('groups').update({ image_url: publicUrl }).eq('id', groupId)
   revalidatePath('/admin')
