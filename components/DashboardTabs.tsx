@@ -232,7 +232,7 @@ export default function DashboardTabs({
                 <MatchCard
                   key={match.id}
                   match={match}
-                  canPredict={tab === 'pending' && new Date(match.scheduled_at) > now}
+                  canPredict={match.status !== 'finished' && new Date(match.scheduled_at) > now}
                   tr={tr}
                 />
               ))}
@@ -266,7 +266,7 @@ export default function DashboardTabs({
                 <MatchCard
                   key={match.id}
                   match={match}
-                  canPredict={tab === 'pending' && new Date(match.scheduled_at) > now}
+                  canPredict={match.status !== 'finished' && new Date(match.scheduled_at) > now}
                   tr={tr}
                 />
               ))}
