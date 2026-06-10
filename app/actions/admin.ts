@@ -4,6 +4,7 @@ import { auth } from '@/auth'
 import { db } from '@/lib/supabase'
 import { calculatePoints } from '@/lib/scoring'
 import { revalidatePath } from 'next/cache'
+import bcrypt from 'bcryptjs'
 
 function isAdmin(email: string | null | undefined): boolean {
   const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map((e) => e.trim())
@@ -118,9 +119,11 @@ export async function createGroup(formData: FormData) {
 
   const name = (formData.get('name') as string)?.trim()
   const inviteCode = (formData.get('invite_code') as string)?.trim().toUpperCase()
-  if (!name || !inviteCode) throw new Error('Name and invite code required')
+  const password = (formData.get('password') as string)?.trim()
+  if (!name || !inviteCode || !password) throw new Error('Name, invite code and password required')
 
-  const { error } = await db().from('groups').insert({ name, invite_code: inviteCode })
+  const passwordHash = await bcrypt.hash(password, 10)
+  const { error } = await db().from('groups').insert({ name, invite_code: inviteCode, password_hash: passwordHash })
   if (error) throw new Error(error.message)
   revalidatePath('/admin')
   revalidatePath('/leaderboard')

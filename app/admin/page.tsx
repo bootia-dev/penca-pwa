@@ -108,6 +108,10 @@ export default async function AdminPage() {
             <label className="block text-xs text-gray-400 mb-1">Invite code</label>
             <input name="invite_code" required placeholder="MYCODE" className={`${inputClass} uppercase`} />
           </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Password</label>
+            <input name="password" type="password" required placeholder="••••••" className={inputClass} />
+          </div>
           <button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-lg transition-colors">
             Create Group
           </button>
