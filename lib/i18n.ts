@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 export const translations = {
   en: {
     nav: { admin: 'Admin' },
-    bottomNav: { matches: 'Matches', rankings: 'Rankings', profile: 'Profile' },
+    bottomNav: { matches: 'Predictions', rankings: 'Rankings', profile: 'Profile' },
     landing: {
       description: 'Predict World Cup results and compete with friends for the top spot.',
       withGoogle: 'Continue with Google',
@@ -103,7 +103,7 @@ export const translations = {
   },
   es: {
     nav: { admin: 'Admin' },
-    bottomNav: { matches: 'Partidos', rankings: 'Tabla', profile: 'Perfil' },
+    bottomNav: { matches: 'Pronósticos', rankings: 'Tabla', profile: 'Perfil' },
     landing: {
       description: 'Predecí los resultados del Mundial y competí con tus amigos.',
       withGoogle: 'Continuar con Google',
