@@ -28,14 +28,10 @@ export default async function DashboardPage() {
     prediction: predMap.get(m.id) ?? null,
   }))
 
-  const pending = withPredictions.filter(
-    (m) => m.status !== 'finished' && new Date(m.scheduled_at) > now && !m.prediction
-  )
-  // Include matches that have started or finished even without a prediction,
-  // so users can see they missed predicting them
-  const predicted = withPredictions.filter(
-    (m) => m.prediction || m.status === 'finished' || new Date(m.scheduled_at) <= now
-  )
+  // Pending = no prediction yet (upcoming to predict, or started/finished and missed)
+  const pending = withPredictions.filter((m) => !m.prediction)
+  // Predicted = has a prediction
+  const predicted = withPredictions.filter((m) => m.prediction)
 
   const totalPoints = predictions.reduce((sum, p) => sum + (p.points ?? 0), 0)
 
