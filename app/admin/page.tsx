@@ -214,7 +214,10 @@ export default async function AdminPage() {
                 <div className="flex flex-col gap-1">
                   {members.map((m) => (
                     <div key={m.user_id} className="flex items-center justify-between py-1 border-t border-gray-700/50">
-                      <span className="text-gray-300 text-sm truncate">{userMap.get(m.user_id) ?? m.user_id}</span>
+                      <span className="text-gray-300 text-sm truncate">
+                        {userMap.get(m.user_id) ?? m.user_id}
+                        {userMap.has(m.user_id) && <span className="text-gray-500 ml-1">({m.user_id})</span>}
+                      </span>
                       <form action={async () => { 'use server'; await removeGroupMember(group.id, m.user_id) }}>
                         <button type="submit" className="text-xs text-gray-500 hover:text-red-400 transition-colors ml-4 shrink-0">
                           {tr.removeMember}
