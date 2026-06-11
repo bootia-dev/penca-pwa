@@ -90,7 +90,13 @@ export default function MatchCard({ match, canPredict, tr }: Props) {
             <span className="text-gray-500">-</span>
             <span className="text-xl font-bold text-gray-300">{prediction.predicted_b}</span>
           </div>
-        ) : null}
+        ) : (
+          <div className="flex items-center gap-2 opacity-40">
+            <span className="text-xl font-bold text-gray-400">–</span>
+            <span className="text-gray-500 text-xs">{tr.matchCard.noPrediction}</span>
+            <span className="text-xl font-bold text-gray-400">–</span>
+          </div>
+        )}
       </div>
     </div>
   )

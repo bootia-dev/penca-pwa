@@ -31,7 +31,11 @@ export default async function DashboardPage() {
   const pending = withPredictions.filter(
     (m) => m.status !== 'finished' && new Date(m.scheduled_at) > now && !m.prediction
   )
-  const predicted = withPredictions.filter((m) => m.prediction)
+  // Include matches that have started or finished even without a prediction,
+  // so users can see they missed predicting them
+  const predicted = withPredictions.filter(
+    (m) => m.prediction || m.status === 'finished' || new Date(m.scheduled_at) <= now
+  )
 
   const totalPoints = predictions.reduce((sum, p) => sum + (p.points ?? 0), 0)
 
