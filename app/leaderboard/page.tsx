@@ -10,6 +10,23 @@ import TimezoneNote from '@/components/TimezoneNote'
 
 export const revalidate = 0
 
+async function fetchAllPredictions(filterUserIds: string[] | null): Promise<{ user_id: string; points: number | null }[]> {
+  const PAGE = 1000
+  const rows: { user_id: string; points: number | null }[] = []
+  let offset = 0
+  while (true) {
+    const q = filterUserIds
+      ? db().from('predictions').select('user_id, points').in('user_id', filterUserIds)
+      : db().from('predictions').select('user_id, points')
+    const { data } = await q.range(offset, offset + PAGE - 1)
+    if (!data || data.length === 0) break
+    rows.push(...data)
+    if (data.length < PAGE) break
+    offset += PAGE
+  }
+  return rows
+}
+
 export default async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ group?: string }> }) {
   const [session, locale, sp] = await Promise.all([auth(), getLocale(), searchParams])
   const currentUserId = session!.user!.email!
@@ -42,10 +59,8 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
 
   const now = new Date()
 
-  const [predictionsRes, usersRes, liveMatchesRes] = await Promise.all([
-    filterUserIds
-      ? db().from('predictions').select('user_id, points').in('user_id', filterUserIds)
-      : db().from('predictions').select('user_id, points'),
+  const [allPredictions, usersRes, liveMatchesRes] = await Promise.all([
+    fetchAllPredictions(filterUserIds),
     filterUserIds
       ? db().from('users').select('id, name, image').in('id', filterUserIds)
       : db().from('users').select('id, name, image'),
@@ -87,7 +102,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
   }
 
   const entryMap = new Map<string, Entry>()
-  for (const p of predictionsRes.data ?? []) {
+  for (const p of allPredictions) {
     const user = users.get(p.user_id)
     if (!user) continue
     const entry = entryMap.get(p.user_id) ?? {
