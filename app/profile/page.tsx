@@ -16,7 +16,7 @@ export default async function ProfilePage() {
 
   const totalPoints = (predictions ?? []).reduce((sum, p) => sum + (p.points ?? 0), 0)
   const totalPredictions = predictions?.length ?? 0
-  const exactScores = (predictions ?? []).filter((p) => p.points === 3).length
+  const exactScores = (predictions ?? []).filter((p) => p.points === 4 || p.points === 6).length
 
   return (
     <>

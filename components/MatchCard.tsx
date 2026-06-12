@@ -6,8 +6,9 @@ import type { MatchWithPrediction } from '@/types'
 import type { T } from '@/lib/i18n'
 
 const POINTS_COLORS: Record<number, string> = {
-  5: 'text-yellow-400',
-  4: 'text-emerald-400',
+  6: 'text-yellow-400',
+  5: 'text-emerald-400',
+  4: 'text-yellow-400',
   3: 'text-blue-400',
   0: 'text-red-400',
 }

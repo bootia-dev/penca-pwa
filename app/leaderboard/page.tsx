@@ -112,7 +112,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
     entry.predictions_count++
     if (p.points != null) {
       entry.total_points += p.points
-      if (p.points === 5) entry.exact_scores++
+      if (p.points === 4 || p.points === 6) entry.exact_scores++
     }
     entryMap.set(p.user_id, entry)
   }
