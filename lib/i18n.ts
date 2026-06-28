@@ -95,6 +95,7 @@ export const translations = {
     },
     stages: {
       group: 'Group',
+      round_of_32: 'Round of 32',
       round_of_16: 'Round of 16',
       quarterfinal: 'Quarterfinal',
       semifinal: 'Semifinal',
@@ -195,6 +196,7 @@ export const translations = {
     },
     stages: {
       group: 'Fase de grupos',
+      round_of_32: 'Dieciseisavos de final',
       round_of_16: 'Octavos de final',
       quarterfinal: 'Cuartos de final',
       semifinal: 'Semifinal',

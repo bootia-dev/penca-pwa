@@ -12,7 +12,7 @@ export interface Match {
   team_b: string
   flag_a: string
   flag_b: string
-  stage: 'group' | 'round_of_16' | 'quarterfinal' | 'semifinal' | 'final'
+  stage: 'group' | 'round_of_32' | 'round_of_16' | 'quarterfinal' | 'semifinal' | 'final'
   group_name: string | null
   scheduled_at: string
   result_a: number | null

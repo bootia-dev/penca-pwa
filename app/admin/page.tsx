@@ -57,6 +57,7 @@ export default async function AdminPage() {
             <label className="block text-xs text-gray-400 mb-1">{tr.stage}</label>
             <select name="stage" required className={inputClass}>
               <option value="group">{stages.group}</option>
+              <option value="round_of_32">{stages.round_of_32}</option>
               <option value="round_of_16">{stages.round_of_16}</option>
               <option value="quarterfinal">{stages.quarterfinal}</option>
               <option value="semifinal">{stages.semifinal}</option>
