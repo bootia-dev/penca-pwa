@@ -7,10 +7,10 @@ import TimezoneNote from './TimezoneNote'
 import type { MatchWithPrediction } from '@/types'
 import type { T } from '@/lib/i18n'
 
-type StageKey = 'group' | 'round_of_32' | 'round_of_16' | 'quarterfinal' | 'semifinal' | 'final'
+type StageKey = 'group' | 'round_of_32' | 'round_of_16' | 'quarterfinal' | 'semifinal' | 'third_place' | 'final'
 type ViewMode = 'date' | 'group'
 
-const KNOCKOUT_ORDER: StageKey[] = ['round_of_32', 'round_of_16', 'quarterfinal', 'semifinal', 'final']
+const KNOCKOUT_ORDER: StageKey[] = ['round_of_32', 'round_of_16', 'quarterfinal', 'semifinal', 'third_place', 'final']
 
 // en-CA gives YYYY-MM-DD in the browser's local timezone — sortable and correct
 function localDateKey(scheduledAt: string): string {

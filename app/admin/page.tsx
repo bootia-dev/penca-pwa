@@ -61,6 +61,7 @@ export default async function AdminPage() {
               <option value="round_of_16">{stages.round_of_16}</option>
               <option value="quarterfinal">{stages.quarterfinal}</option>
               <option value="semifinal">{stages.semifinal}</option>
+              <option value="third_place">{stages.third_place}</option>
               <option value="final">{stages.final}</option>
             </select>
           </div>
